@@ -19,24 +19,24 @@ double calculateMinimumDistance(const emc::LaserData& scan)
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_driving(emc::Data& data)
+void state_driving(emc::FSMInterface& fsm, emc::IO& io)
 {
     std::cout << "driving" << std::endl;
 
-    while(data.running())
+    while(fsm.running())
     {
         emc::LaserData scan;
-        if (data.readLaserData(scan))
+        if (io.readLaserData(scan))
         {
             double min_dist = calculateMinimumDistance(scan);
             if (min_dist < 0.2)    // magic number!
             {
-                data.raiseEvent("obstacle_near");
+                fsm.raiseEvent("obstacle_near");
                 return;
             }
 
             // No obstacles near, so let's go!
-            data.sendBaseReference(0.3, 0, 0);
+            io.sendBaseReference(0.3, 0, 0);
         }
 
         usleep(100000);
@@ -45,23 +45,23 @@ void state_driving(emc::Data& data)
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_waiting(emc::Data& data)
+void state_waiting(emc::FSMInterface& fsm, emc::IO& io)
 {
     std::cout << "waiting" << std::endl;
 
     // Stop the base!
-    data.sendBaseReference(0, 0, 0);
+    io.sendBaseReference(0, 0, 0);
 
-    while(data.running())
+    while(fsm.running())
     {
         emc::LaserData scan;
-        if (data.readLaserData(scan))
+        if (io.readLaserData(scan))
         {
             double min_dist = calculateMinimumDistance(scan);
             if (min_dist > 0.2)
             {
                 // All clear!
-                data.raiseEvent("all_clear");
+                fsm.raiseEvent("all_clear");
                 return;
             }
         }

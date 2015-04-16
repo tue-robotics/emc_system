@@ -45,15 +45,16 @@ void Engine::run()
     ros::Rate r(1000);
     while(ros::ok())
     {
-        Data data(comm_);
+        IO io(comm_);
+        FSMInterface fsm;
 
         StateDetail& s = state_details[state_];
-        s.func(data);
+        s.func(fsm, io);
 
-        int event_id = getEvent(data.event().c_str());
+        int event_id = getEvent(fsm.event().c_str());
         if (event_id < 0)
         {
-            addError("Unknown event '" + data.event() + "' raised in state '" + stateToString(state_) + "'");
+            addError("Unknown event '" + fsm.event() + "' raised in state '" + stateToString(state_) + "'");
             break;
         }
 

@@ -7,17 +7,17 @@
 namespace emc
 {
 
-bool Data::readLaserData(LaserData& scan)
+bool IO::readLaserData(LaserData& scan)
 {
     return comm_->readLaserData(scan);
 }
 
-void Data::sendBaseReference(double vx, double vy, double va)
+void IO::sendBaseReference(double vx, double vy, double va)
 {
     comm_->sendBaseReference(vx, vy, va);
 }
 
-bool Data::running() const
+bool FSMInterface::running() const
 {
     return ros::ok();
 }

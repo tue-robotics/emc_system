@@ -19,29 +19,40 @@ struct LaserData
 
 // ----------------------------------------------------------------------------------------------------
 
-class Data
+class IO
 {
 
 public:
 
-    Data(Communication* comm) : comm_(comm) {}
+    IO(Communication* comm) : comm_(comm) {}
+
+    bool readLaserData(LaserData& scan);
+
+    void sendBaseReference(double vx, double vy, double va);
+
+private:
+
+    Communication* comm_;
+
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+class FSMInterface
+{
+
+public:
 
     void raiseEvent(const char* event)
     {
         event_ = event;
     }
 
-    bool readLaserData(LaserData& scan);
-
-    void sendBaseReference(double vx, double vy, double va);
-
     bool running() const;
 
     const std::string& event() const { return event_; }
 
 private:
-
-    Communication* comm_;
 
     std::string event_;
 

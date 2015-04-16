@@ -11,7 +11,7 @@ namespace emc
 
 static const char* no_event = 0;
 
-typedef void (*state_function)(Data&);
+typedef void (*state_function)(FSMInterface&, IO& io);
 
 class Communication;
 
