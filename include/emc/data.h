@@ -2,6 +2,7 @@
 #define EMC_SYSTEM_DATA_H_
 
 #include <vector>
+#include <string>
 
 namespace emc
 {
@@ -17,7 +18,7 @@ struct LaserData
 
 struct ComputationData
 {
-    double dt;
+    std::string event;
 
     LaserData laser_data;
 

@@ -9,8 +9,11 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-System::System() : comm_(new Communication), state_(-1)
+System::System() : comm_(new Communication), state_(-1), has_error_(false)
 {
+    // Register the special 'null' event
+    events.push_back("NO_EVENT");
+    event_to_int[""] = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -24,9 +27,12 @@ System::~System()
 
 void System::run()
 {
+    if (has_error_)
+        return;
+
     if (state_ < 0)
     {
-        std::cout << "Please provide starting state" << std::endl;
+        addError("Initial state not specified");
         return;
     }
 
@@ -36,28 +42,29 @@ void System::run()
 
     comm_->init();
 
-    double cycle_freq = 100;
-    double cycle_time = 1.0 / cycle_freq;
-
-    ros::Rate r(100);
     while(ros::ok())
     {
         ComputationData data;
-        data.dt = cycle_time;
         comm_->fillData(data);
 
         StateDetail& s = state_details[state_];
-        int event = s.func(data);
-        std::map<int, int> ::const_iterator it = s.transitions.find(event);
+        s.func(data);
+
+        int event_id = getEvent(data.event.c_str());
+        if (event_id < 0)
+        {
+            addError("Unknown event '" + data.event + "' raised in state '" + stateToString(state_) + "'");
+            break;
+        }
+
+        std::map<int, int> ::const_iterator it = s.transitions.find(event_id);
         if (it == s.transitions.end())
         {
-            std::cout << "Cannot deal with event " << event << " in state " << state_ << std::endl;
-            return;
+            addError("Cannot deal with event '" + eventToString(event_id) + "'' in state '" + stateToString(state_) + "'");
+            break;
         }
 
         state_ = it->second;
-
-        r.sleep();
     }
 }
 
