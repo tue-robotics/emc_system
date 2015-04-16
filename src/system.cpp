@@ -42,18 +42,18 @@ void System::run()
 
     comm_->init();
 
+    ros::Rate r(1000);
     while(ros::ok())
     {
-        ComputationData data;
-        comm_->fillData(data);
+        Data data(comm_);
 
         StateDetail& s = state_details[state_];
         s.func(data);
 
-        int event_id = getEvent(data.event.c_str());
+        int event_id = getEvent(data.event().c_str());
         if (event_id < 0)
         {
-            addError("Unknown event '" + data.event + "' raised in state '" + stateToString(state_) + "'");
+            addError("Unknown event '" + data.event() + "' raised in state '" + stateToString(state_) + "'");
             break;
         }
 
@@ -65,6 +65,8 @@ void System::run()
         }
 
         state_ = it->second;
+
+        r.sleep();
     }
 }
 

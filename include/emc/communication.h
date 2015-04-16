@@ -23,7 +23,9 @@ public:
 
     void init();
 
-    void fillData(ComputationData& data);
+    bool readLaserData(LaserData& scan);
+
+    void sendBaseReference(double vx, double vy, double va);
 
 private:
 

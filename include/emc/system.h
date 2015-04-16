@@ -11,6 +11,8 @@ namespace emc
 
 static const char* no_event = 0;
 
+typedef void (*state_function)(Data&);
+
 class Communication;
 
 class System
@@ -29,7 +31,7 @@ public:
             addError("While setting initial state: Unknown state: '" + std::string(state) + "'");
     }
 
-    void registerState(const char* state, void (*func)(ComputationData&))
+    void registerState(const char* state, state_function func)
     {
         int s_id = addState(state);
         if (s_id < 0)
@@ -79,7 +81,7 @@ private:
 
         std::string name;
         std::map<int, int> transitions;
-        void (*func)(ComputationData&);
+        state_function func;
     };
 
     std::map<std::string, int> event_to_int;
