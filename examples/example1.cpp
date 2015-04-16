@@ -1,4 +1,4 @@
-#include <emc/system.h>
+#include <emc/engine.h>
 
 #include <iostream>
 #include <unistd.h> // usleep
@@ -74,16 +74,16 @@ void state_waiting(emc::Data& data)
 
 int main(int argc, char **argv)
 {
-    emc::System system;
+    emc::Engine engine;
 
-    system.registerState("driving", state_driving);
-    system.registerState("waiting", state_waiting);
-    system.registerTransition("driving", "obstacle_near", "waiting");
-    system.registerTransition("waiting", "all_clear", "driving");
+    engine.registerState("driving", state_driving);
+    engine.registerState("waiting", state_waiting);
+    engine.registerTransition("driving", "obstacle_near", "waiting");
+    engine.registerTransition("waiting", "all_clear", "driving");
 
-    system.setInitialState("waiting");
+    engine.setInitialState("waiting");
 
-    system.run();
+    engine.run();
 
     return 0;
 }

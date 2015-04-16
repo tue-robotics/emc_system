@@ -1,4 +1,4 @@
-#include "emc/system.h"
+#include "emc/engine.h"
 #include "emc/communication.h"
 
 #include <ros/init.h>
@@ -9,7 +9,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-System::System() : comm_(new Communication), state_(-1), has_error_(false)
+Engine::Engine() : comm_(new Communication), state_(-1), has_error_(false)
 {
     // Register the special 'null' event
     events.push_back("NO_EVENT");
@@ -18,14 +18,14 @@ System::System() : comm_(new Communication), state_(-1), has_error_(false)
 
 // ----------------------------------------------------------------------------------------------------
 
-System::~System()
+Engine::~Engine()
 {
     delete comm_;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void System::run()
+void Engine::run()
 {
     if (has_error_)
         return;

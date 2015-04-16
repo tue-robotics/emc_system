@@ -57,11 +57,11 @@ include_directories(
 )
 
 add_library(emc_system
-    include/emc/system.h
+    include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
 
-    src/system.cpp
+    src/engine.cpp
     src/communication.cpp
     src/data.cpp
 )

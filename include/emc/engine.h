@@ -15,14 +15,14 @@ typedef void (*state_function)(Data&);
 
 class Communication;
 
-class System
+class Engine
 {
 
 public:
 
-    System();
+    Engine();
 
-    ~System();
+    ~Engine();
 
     void setInitialState(const char* state)
     {
