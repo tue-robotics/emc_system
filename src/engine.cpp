@@ -51,6 +51,9 @@ void Engine::run()
         StateDetail& s = state_details[state_];
         s.func(fsm, io);
 
+        if (!ros::ok())
+            break;
+
         int event_id = getEvent(fsm.event().c_str());
         if (event_id < 0)
         {
