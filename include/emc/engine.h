@@ -61,8 +61,6 @@ public:
             return;
         }
 
-
-
         StateDetail& s1_data = state_details[s1];
         s1_data.transitions[e] = s2;
     }
@@ -142,6 +140,8 @@ private:
 
         int e_id = event_to_int.size();
         event_to_int[event] = e_id;
+        events.push_back(event);
+
         return e_id;
     }
 
