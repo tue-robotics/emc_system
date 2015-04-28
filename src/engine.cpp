@@ -9,7 +9,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Engine::Engine() : comm_(new Communication), state_(-1), has_error_(false)
+Engine::Engine() : comm_(new Communication), state_(-1), has_error_(false), loop_freq_(0), user_data_(0)
 {
     // Register the special 'null' event
     events.push_back("NO_EVENT");
@@ -36,20 +36,26 @@ void Engine::run()
         return;
     }
 
+    if (loop_freq_ <= 0)
+    {
+        addError("Loop frequency not set.");
+        return;
+    }
+
     ros::VP_string args;
     ros::init(args, "emc_system");
     ros::Time::init();
 
     comm_->init();
 
-    ros::Rate r(1000);
+    ros::Rate r(loop_freq_);
     while(ros::ok())
     {
         IO io(comm_);
         FSMInterface fsm;
 
         StateDetail& s = state_details[state_];
-        s.func(fsm, io);
+        s.func(fsm, io, user_data_);
 
         if (!ros::ok())
             break;
@@ -61,14 +67,17 @@ void Engine::run()
             break;
         }
 
-        std::map<int, int> ::const_iterator it = s.transitions.find(event_id);
-        if (it == s.transitions.end())
+        if (event_id > 0)
         {
-            addError("Cannot deal with event '" + eventToString(event_id) + "'' in state '" + stateToString(state_) + "'");
-            break;
-        }
+            std::map<int, int> ::const_iterator it = s.transitions.find(event_id);
+            if (it == s.transitions.end())
+            {
+                addError("Cannot deal with event '" + eventToString(event_id) + "'' in state '" + stateToString(state_) + "'");
+                break;
+            }
 
-        state_ = it->second;
+            state_ = it->second;
+        }
 
         r.sleep();
     }

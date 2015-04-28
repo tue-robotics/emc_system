@@ -11,7 +11,7 @@ namespace emc
 
 static const char* no_event = 0;
 
-typedef void (*state_function)(FSMInterface&, IO& io);
+typedef void (*state_function)(FSMInterface&, IO& io, void* user_data);
 
 class Communication;
 
@@ -67,6 +67,10 @@ public:
 
     void run();
 
+    void setLoopFrequency(double freq) { loop_freq_ = freq; }
+
+    void setUserData(void* user_data) { user_data_ = user_data; }
+
 private:
 
     Communication* comm_;
@@ -89,6 +93,10 @@ private:
     std::vector<std::string> events;
 
     std::vector<StateDetail> state_details;
+
+    void* user_data_;
+
+    double loop_freq_;
 
     int addState(const char* state)
     {
