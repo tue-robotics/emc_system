@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
             cv::Point2d p = worldToCanvas(x, y);
             if (p.x >= 0 && p.y >= 0 && p.x < canvas.cols && p.y < canvas.rows)
-                canvas.at<cv::Vec3b>(p) = cv::Vec3b(255, 0, 0);
+                canvas.at<cv::Vec3b>(p) = cv::Vec3b(0, 255, 0);
 
             a += scan.angle_increment;
         }
