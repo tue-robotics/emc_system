@@ -44,8 +44,14 @@ bool Communication::readLaserData(LaserData& scan)
     if (!laser_msg_)
         return false;
 
+    scan.range_min = laser_msg_->range_min;
     scan.range_max = laser_msg_->range_max;
     scan.ranges = laser_msg_->ranges;
+    scan.angle_min = laser_msg_->angle_min;
+    scan.angle_max = laser_msg_->angle_max;
+    scan.angle_increment = laser_msg_->angle_increment;
+    scan.timestamp = laser_msg_->header.stamp.toSec();
+
     return true;
 }
 

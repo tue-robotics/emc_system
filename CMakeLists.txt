@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
 # find_package(PCL REQUIRED)
-# find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
 #                                     ROS MESSAGES AND SERVICES
@@ -54,6 +54,7 @@ catkin_package(
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
 )
 
 add_library(emc_system
@@ -68,6 +69,13 @@ add_library(emc_system
     src/io.cpp
 )
 target_link_libraries(emc_system ${catkin_LIBRARIES})
+
+# ------------------------------------------------------------------------------------------------
+#                                              TOOLS
+# ------------------------------------------------------------------------------------------------
+
+add_executable(emc_viz tools/visualize.cpp)
+target_link_libraries(emc_viz emc_system ${OpenCV_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES

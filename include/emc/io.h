@@ -4,10 +4,10 @@
 #include <vector>
 #include <string>
 
+#include "emc/data.h"
+
 namespace emc
 {
-
-struct LaserData;
 
 class Communication;
 
