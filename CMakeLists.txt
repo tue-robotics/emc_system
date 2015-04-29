@@ -60,10 +60,12 @@ add_library(emc_system
     include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
+    include/emc/io.h
 
     src/engine.cpp
     src/communication.cpp
     src/data.cpp
+    src/io.cpp
 )
 target_link_libraries(emc_system ${catkin_LIBRARIES})
 
@@ -71,7 +73,9 @@ target_link_libraries(emc_system ${catkin_LIBRARIES})
 #                                             EXAMPLES
 # ------------------------------------------------------------------------------------------------
 
-add_executable(emc_example1 examples/example1.cpp)
-target_link_libraries(emc_example1 emc_system)
+add_executable(emc_example2 examples/example1.cpp)
+target_link_libraries(emc_example2 emc_system)
 
+add_executable(emc_example1 examples/example01.cpp)
+target_link_libraries(emc_example1 emc_system)
 

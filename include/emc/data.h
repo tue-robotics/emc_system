@@ -19,25 +19,6 @@ struct LaserData
 
 // ----------------------------------------------------------------------------------------------------
 
-class IO
-{
-
-public:
-
-    IO(Communication* comm) : comm_(comm) {}
-
-    bool readLaserData(LaserData& scan);
-
-    void sendBaseReference(double vx, double vy, double va);
-
-private:
-
-    Communication* comm_;
-
-};
-
-// ----------------------------------------------------------------------------------------------------
-
 class FSMInterface
 {
 

@@ -1,7 +1,6 @@
 #include <emc/engine.h>
 
 #include <iostream>
-#include <unistd.h> // usleep
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -96,7 +95,7 @@ void state_waiting(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
 
 // ----------------------------------------------------------------------------------------------------
 
-int main(int argc, char **argv)
+int main()
 {
     // Initialize the state machine engine
     emc::Engine engine;

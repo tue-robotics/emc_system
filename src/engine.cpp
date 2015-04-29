@@ -9,7 +9,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Engine::Engine() : comm_(new Communication), state_(-1), has_error_(false), loop_freq_(0), user_data_(0)
+Engine::Engine() : io_(0), state_(-1), has_error_(false), loop_freq_(0), user_data_(0)
 {
     // Register the special 'null' event
     events.push_back("NO_EVENT");
@@ -20,7 +20,7 @@ Engine::Engine() : comm_(new Communication), state_(-1), has_error_(false), loop
 
 Engine::~Engine()
 {
-    delete comm_;
+    delete io_;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -42,20 +42,16 @@ void Engine::run()
         return;
     }
 
-    ros::VP_string args;
-    ros::init(args, "emc_system");
-    ros::Time::init();
-
-    comm_->init();
+//    comm_->init();
+    io_ = new IO;
 
     ros::Rate r(loop_freq_);
     while(ros::ok())
     {
-        IO io(comm_);
         FSMInterface fsm;
 
         StateDetail& s = state_details[state_];
-        s.func(fsm, io, user_data_);
+        s.func(fsm, *io_, user_data_);
 
         if (!ros::ok())
             break;

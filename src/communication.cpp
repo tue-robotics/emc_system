@@ -11,6 +11,15 @@ namespace emc
 
 Communication::Communication()
 {
+
+    ros::VP_string args;
+    ros::init(args, "emc_system");
+    ros::Time::init();
+
+    ros::NodeHandle nh;
+    nh.setCallbackQueue(&cb_queue_);
+    sub_laser_ = nh.subscribe<sensor_msgs::LaserScan>("/pico/laser", 1, &Communication::laserCallback, this);
+    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>("/pico/base/reference", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -23,10 +32,6 @@ Communication::~Communication()
 
 void Communication::init()
 {
-    ros::NodeHandle nh;
-    nh.setCallbackQueue(&cb_queue_);
-    sub_laser_ = nh.subscribe<sensor_msgs::LaserScan>("/pico/laser", 1, &Communication::laserCallback, this);
-    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>("/pico/base/reference", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -46,7 +51,7 @@ bool Communication::readLaserData(LaserData& scan)
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::sendBaseReference(double vx, double vy, double va)
+void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
     geometry_msgs::Twist ref;
     ref.linear.x = vx;

@@ -2,6 +2,7 @@
 #define EMC_SYSTEM_SYSTEM_H_
 
 #include "emc/data.h"
+#include "emc/io.h"
 
 #include <map>
 #include <iostream>
@@ -73,7 +74,7 @@ public:
 
 private:
 
-    Communication* comm_;
+    IO* io_;
 
     int state_;
 

@@ -25,7 +25,7 @@ public:
 
     bool readLaserData(LaserData& scan);
 
-    void sendBaseReference(double vx, double vy, double va);
+    void sendBaseVelocity(double vx, double vy, double va);
 
 private:
 
