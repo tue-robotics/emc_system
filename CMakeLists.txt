@@ -62,6 +62,7 @@ add_library(emc_system
     include/emc/communication.h
     include/emc/data.h
     include/emc/io.h
+    include/emc/rate.h
 
     src/engine.cpp
     src/communication.cpp
