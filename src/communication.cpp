@@ -13,7 +13,7 @@ Communication::Communication()
 {
 
     ros::VP_string args;
-    ros::init(args, "emc_system");
+    ros::init(args, "emc_system", ros::init_options::AnonymousName);
     ros::Time::init();
 
     ros::NodeHandle nh;
