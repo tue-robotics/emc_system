@@ -7,6 +7,7 @@ namespace emc
 
 Rate::Rate(double freq)
 {
+    ros::Time::init();
     rate_ = new ros::Rate(freq);
 }
 
