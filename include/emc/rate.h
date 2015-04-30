@@ -1,7 +1,10 @@
 #ifndef EMC_SYSTEM_RATE_H_
 #define EMC_SYSTEM_RATE_H_
 
-#include <ros/rate.h>
+namespace ros
+{
+class Rate;
+}
 
 namespace emc
 {
@@ -11,13 +14,13 @@ class Rate
 
 public:
 
-    Rate(double freq) : rate_(freq) {}
+    Rate(double freq);
 
-    void sleep() { rate_.sleep(); }
+    void sleep();
 
 private:
 
-    ros::Rate rate_;
+    ros::Rate* rate_;
 
 };
 

@@ -68,6 +68,7 @@ add_library(emc_system
     src/communication.cpp
     src/data.cpp
     src/io.cpp
+    src/rate.cpp
 )
 target_link_libraries(emc_system ${catkin_LIBRARIES})
 
