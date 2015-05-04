@@ -23,6 +23,11 @@ bool IO::readLaserData(LaserData& scan)
     return comm_->readLaserData(scan);
 }
 
+bool IO::readOdometryData(OdometryData& odom)
+{
+    return comm_->readOdometryData(odom);
+}
+
 void IO::sendBaseReference(double vx, double vy, double va)
 {
     comm_->sendBaseVelocity(vx, vy, va);

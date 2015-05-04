@@ -5,6 +5,7 @@
 #include <string>
 
 #include "emc/data.h"
+#include "emc/odom.h"
 
 namespace emc
 {
@@ -21,6 +22,8 @@ public:
     ~IO();
 
     bool readLaserData(LaserData& scan);
+
+    bool readOdometryData(OdometryData& odom);
 
     void sendBaseReference(double vx, double vy, double va);
 

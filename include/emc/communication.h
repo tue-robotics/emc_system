@@ -2,12 +2,14 @@
 #define EMC_COMMUNICATION_H_
 
 #include "emc/data.h"
+#include "emc/odom.h"
 
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
 #include <ros/callback_queue.h>
 
 #include <sensor_msgs/LaserScan.h>
+#include <nav_msgs/Odometry.h>
 
 namespace emc
 {
@@ -25,18 +27,37 @@ public:
 
     bool readLaserData(LaserData& scan);
 
+    bool readOdometryData(OdometryData& odom);
+
     void sendBaseVelocity(double vx, double vy, double va);
 
 private:
 
-    ros::CallbackQueue cb_queue_;
+    // Base velocity reference
+
+    ros::Publisher pub_base_ref_;
+
+
+    // Laser data
+
+    ros::CallbackQueue laser_cb_queue_;
 
     ros::Subscriber sub_laser_;
-    ros::Publisher pub_base_ref_;
 
     sensor_msgs::LaserScanConstPtr laser_msg_;
 
     void laserCallback(const sensor_msgs::LaserScanConstPtr& msg);
+
+
+    // Odometry data
+
+    ros::CallbackQueue odom_cb_queue_;
+
+    ros::Subscriber sub_odom_;
+
+    nav_msgs::OdometryConstPtr odom_msg_;
+
+    void odomCallback(const nav_msgs::OdometryConstPtr& msg);
 
 };
 

@@ -61,6 +61,7 @@ add_library(emc_system
     include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
+    include/emc/odom.h
     include/emc/io.h
     include/emc/rate.h
 
@@ -78,6 +79,13 @@ target_link_libraries(emc_system ${catkin_LIBRARIES})
 
 add_executable(emc_viz tools/visualize.cpp)
 target_link_libraries(emc_viz emc_system ${OpenCV_LIBRARIES})
+
+# ------------------------------------------------------------------------------------------------
+#                                               IO
+# ------------------------------------------------------------------------------------------------
+
+add_executable(emc_test_io test/test_io.cpp)
+target_link_libraries(emc_test_io emc_system)
 
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
