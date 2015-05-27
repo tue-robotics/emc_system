@@ -31,11 +31,15 @@ public:
 
     void sendBaseVelocity(double vx, double vy, double va);
 
+    void sendOpendoorRequest();
+
 private:
 
     // Base velocity reference
 
     ros::Publisher pub_base_ref_;
+
+    ros::Publisher pub_open_door_;
 
 
     // Laser data

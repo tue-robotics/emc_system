@@ -33,6 +33,11 @@ void IO::sendBaseReference(double vx, double vy, double va)
     comm_->sendBaseVelocity(vx, vy, va);
 }
 
+void IO::sendOpendoorRequest()
+{
+    comm_->sendOpendoorRequest();
+}
+
 bool IO::ok()
 {
     return ros::ok();

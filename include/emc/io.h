@@ -27,6 +27,8 @@ public:
 
     void sendBaseReference(double vx, double vy, double va);
 
+    void sendOpendoorRequest();
+
     bool ok();
 
 private:

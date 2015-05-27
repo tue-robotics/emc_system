@@ -3,6 +3,7 @@
 #include <ros/node_handle.h>
 
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Empty.h>
 
 namespace emc
 {
@@ -25,6 +26,8 @@ Communication::Communication()
     sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/pico/odom", 1, &Communication::odomCallback, this);
 
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/base/reference", 1);
+
+    pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/pico/open_door", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -92,6 +95,14 @@ void Communication::sendBaseVelocity(double vx, double vy, double va)
     ref.angular.z = va;
 
     pub_base_ref_.publish(ref);
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::sendOpendoorRequest()
+{
+    std_msgs::Empty msg;
+    pub_open_door_.publish(msg);
 }
 
 // ----------------------------------------------------------------------------------------------------
