@@ -35,6 +35,9 @@ void IO::sendBaseReference(double vx, double vy, double va)
 
 void IO::sendOpendoorRequest()
 {
+    int dummy;
+    dummy = system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+     
     comm_->sendOpendoorRequest();
 }
 
