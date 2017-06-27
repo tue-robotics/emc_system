@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(emc_system)
 
+
 find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     sensor_msgs
     roscpp
+    message_generation    
 )
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
@@ -16,11 +18,11 @@ find_package(OpenCV REQUIRED)
 # ------------------------------------------------------------------------------------------------
 
 # Generate messages
-# add_message_files(
-#    FILES
-#    message1.msg
+add_message_files(
+   FILES
+   motorCurrent.msg
 #    ...
-# )
+ )
 
 # Generate services
 # add_service_files(
@@ -30,11 +32,12 @@ find_package(OpenCV REQUIRED)
 # )
 
 # Generate added messages and services with any dependencies listed here
-# generate_messages(
-#    DEPENDENCIES
+generate_messages(
+   DEPENDENCIES
+   std_msgs
 #    geometry_msgs
 #    ...
-# )
+)
 
 # ------------------------------------------------------------------------------------------------
 #                                          CATKIN EXPORT
@@ -45,6 +48,7 @@ catkin_package(
 #  LIBRARIES bla
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
+   CATKIN_DEPENDS message_runtime
 )
 
 # ------------------------------------------------------------------------------------------------
