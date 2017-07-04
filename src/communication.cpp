@@ -25,7 +25,7 @@ Communication::Communication()
     nh_odom.setCallbackQueue(&odom_cb_queue_);
     sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/pico/odom", 1, &Communication::odomCallback, this);
 
-    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/base/reference", 1);
+    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/cmd_vel", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/pico/open_door", 1);
 }
