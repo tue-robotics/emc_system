@@ -5,8 +5,29 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
 
+#include <signal.h>
+
 namespace emc
 {
+
+// ----------------------------------------------------------------------------------------------------
+void signalHandler( int signum ) {
+    std::cout << "Interrupt signal (" << signum << ") received.\n";
+    std::cout << "Stopping robot.\n";
+
+    ros::NodeHandle nh;
+    ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("/pico/base/reference", 1);
+    geometry_msgs::Twist ref;
+    ref.linear.x = 0;
+    ref.linear.y = 0;
+    ref.angular.z = 0;
+    pub.publish(ref);
+   // cleanup and close up stuff here
+   // terminate program
+    ros::shutdown();
+
+    exit(signum);
+}
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -28,6 +49,8 @@ Communication::Communication()
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/cmd_vel", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/pico/open_door", 1);
+
+    signal(SIGINT, signalHandler);
 }
 
 // ----------------------------------------------------------------------------------------------------
