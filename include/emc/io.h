@@ -31,7 +31,7 @@ public:
 
     bool ok();
 
-    void speak(std::string& text);
+    void speak(const std::string& text);
 
 private:
 
