@@ -4,6 +4,8 @@
 
 #include <ros/init.h>  // for ros::ok()
 
+#include <string>
+
 namespace emc
 {
 
@@ -26,7 +28,7 @@ bool IO::readLaserData(LaserData& scan)
 bool IO::readOdometryData(OdometryData& odom)
 {
     return comm_->readOdometryData(odom);
-}
+}  
 
 void IO::sendBaseReference(double vx, double vy, double va)
 {
@@ -39,6 +41,13 @@ void IO::sendOpendoorRequest()
     dummy = system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
      
     comm_->sendOpendoorRequest();
+}
+
+void IO::speak(std::string& text)
+{
+    std::string cmd;
+    cmd = "sudo espeak " + text + " --stdout | sudo aplay --device \"default:CARD=Device\"";
+    system(cmd.c_str());
 }
 
 bool IO::ok()

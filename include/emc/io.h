@@ -31,6 +31,8 @@ public:
 
     bool ok();
 
+    void speak(std::string& text);
+
 private:
 
     Communication* comm_;
