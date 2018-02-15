@@ -46,7 +46,9 @@ void IO::sendOpendoorRequest()
 void IO::speak(const std::string& text)
 {
     std::string cmd;
-    cmd = "sudo espeak " + text + " --stdout | sudo aplay --device \"default:CARD=Device\"";
+    //cmd = "sudo espeak " + text + " --stdout | sudo aplay --device \"default:CARD=Device\"";
+    cmd = "espeak " + text + " --stdout | aplay --device \"default:CARD=Device\"";
+
     system(cmd.c_str());
 }
 
