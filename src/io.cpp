@@ -43,7 +43,7 @@ void IO::sendOpendoorRequest()
     comm_->sendOpendoorRequest();
 }
 
-void IO::speak(std::string& text)
+void IO::speak(const std::string& text)
 {
     std::string cmd;
     cmd = "sudo espeak " + text + " --stdout | sudo aplay --device \"default:CARD=Device\"";
