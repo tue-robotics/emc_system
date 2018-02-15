@@ -3,7 +3,7 @@
 int main(){
 
     emc::IO io;
-    io.sendOpendoorRequest();
-    //io.speak("hallo");
+    #io.sendOpendoorRequest();
+    io.speak("Hello my name is Pico");
     return 0;
 }
