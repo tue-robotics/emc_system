@@ -10,6 +10,7 @@
 
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
+#include <string>
 
 namespace emc
 {
@@ -33,6 +34,8 @@ public:
 
     void sendOpendoorRequest();
 
+    void speak(const std::string& text);
+
 private:
 
     // Base velocity reference
@@ -40,6 +43,10 @@ private:
     ros::Publisher pub_base_ref_;
 
     ros::Publisher pub_open_door_;
+
+    ros::Publisher pub_speak_;
+
+    
 
 
     // Laser data
