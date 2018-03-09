@@ -4,7 +4,7 @@
 int main(){
 
     emc::IO io;
-    emc::Rate r(0.2);
+    emc::Rate r(0.3);
     //io.sendOpendoorRequest();
     
 
@@ -17,13 +17,13 @@ int main(){
 
         io.speak("I can turn left");
 
-        io.sendBaseReference(0, 0, 0.1);
+        io.sendBaseReference(0, 0, 0.3);
 
         r.sleep();
 
         io.speak("I can turn right");
 
-        io.sendBaseReference(0, 0, -0.1);
+        io.sendBaseReference(0, 0, -0.3);
 
         r.sleep();
 
