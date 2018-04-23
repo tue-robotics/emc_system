@@ -28,6 +28,11 @@ bool IO::readOdometryData(OdometryData& odom)
     return comm_->readOdometryData(odom);
 }
 
+bool IO::readControlEffort(ControlEffort& ce)
+{
+    return comm_->readControlEffort(ce);
+}
+
 void IO::sendBaseReference(double vx, double vy, double va)
 {
     comm_->sendBaseVelocity(vx, vy, va);

@@ -25,6 +25,8 @@ public:
 
     bool readOdometryData(OdometryData& odom);
 
+    bool readControlEffort(ControlEffort& ce);
+
     void sendBaseReference(double vx, double vy, double va);
 
     void sendOpendoorRequest();

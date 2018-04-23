@@ -22,6 +22,14 @@ struct LaserData
     std::vector<float> ranges;
 };
 
+struct ControlEffort
+{
+    double x;
+    double y;
+    double th;
+    double timestamp;
+};
+
 // ----------------------------------------------------------------------------------------------------
 
 class FSMInterface

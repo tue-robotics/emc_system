@@ -4,6 +4,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
+#include <emc_system/controlEffort.h>
 
 namespace emc
 {
@@ -24,6 +25,10 @@ Communication::Communication()
     ros::NodeHandle nh_odom;
     nh_odom.setCallbackQueue(&odom_cb_queue_);
     sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/pico/odom", 1, &Communication::odomCallback, this);
+
+    ros::NodeHandle nh_ce;
+    nh_ce.setCallbackQueue(&ce_cb_queue_);
+    sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/pico/controlEffort", 1, &Communication::controlEffortCallback, this);
 
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/cmd_vel", 1);
 
@@ -87,6 +92,26 @@ bool Communication::readOdometryData(OdometryData& odom)
 
 // ----------------------------------------------------------------------------------------------------
 
+bool Communication::readControlEffort(ControlEffort& ce)
+{
+    ce_msg_.reset();
+    ce_cb_queue_.callAvailable();
+
+    if (!ce_msg_)
+        return false;
+
+    ce.x  = ce_msg_->I_x;
+    ce.y  = ce_msg_->I_y;
+    ce.th = ce_msg_->I_th;
+
+    ce.timestamp = ce_msg_->header.stamp.toSec();
+
+    return true;
+}
+
+
+// ----------------------------------------------------------------------------------------------------
+
 void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
     geometry_msgs::Twist ref;
@@ -117,6 +142,13 @@ void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
 void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
 {
     odom_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
+{
+    ce_msg_ = msg;
 }
 
 } // end namespace emc

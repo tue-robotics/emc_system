@@ -10,6 +10,7 @@
 
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
+#include <emc_system/controlEffort.h>
 
 namespace emc
 {
@@ -28,6 +29,8 @@ public:
     bool readLaserData(LaserData& scan);
 
     bool readOdometryData(OdometryData& odom);
+
+    bool readControlEffort(ControlEffort& ce);
 
     void sendBaseVelocity(double vx, double vy, double va);
 
@@ -62,6 +65,17 @@ private:
     nav_msgs::OdometryConstPtr odom_msg_;
 
     void odomCallback(const nav_msgs::OdometryConstPtr& msg);
+
+
+    // Control effort data
+
+    ros::CallbackQueue ce_cb_queue_;
+
+    ros::Subscriber sub_ce_;
+
+    emc_system::controlEffortConstPtr ce_msg_;
+
+    void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
 
 };
 
