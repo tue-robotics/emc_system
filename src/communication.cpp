@@ -5,6 +5,7 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
 #include <emc_system/controlEffort.h>
+#include <std_msgs/String.h>
 
 namespace emc
 {
@@ -33,6 +34,8 @@ Communication::Communication()
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/cmd_vel", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/pico/open_door", 1);
+
+    pub_speak_ = nh_laser.advertise<std_msgs::String>("/pico/speak", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -128,6 +131,15 @@ void Communication::sendOpendoorRequest()
 {
     std_msgs::Empty msg;
     pub_open_door_.publish(msg);
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::speak(const std::string& text)
+{
+    std_msgs::String str;
+    str.data = text;
+    pub_speak_.publish(str);
 }
 
 // ----------------------------------------------------------------------------------------------------
