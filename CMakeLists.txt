@@ -76,6 +76,7 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
+add_dependencies(emc_system ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(emc_system ${catkin_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------
