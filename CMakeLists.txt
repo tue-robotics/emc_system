@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(emc_system)
-
 
 find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
@@ -105,4 +104,3 @@ target_link_libraries(emc_example1 emc_system)
 
 add_executable(testspeech test/testspeech.cpp)
 target_link_libraries(testspeech emc_system)
-
