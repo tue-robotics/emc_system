@@ -21,7 +21,7 @@ class Communication
 
 public:
 
-    Communication();
+    Communication(std::string robot_name="pico");
 
     ~Communication();
 
