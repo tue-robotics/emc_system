@@ -4,6 +4,8 @@
 #include <opencv2/highgui.hpp>
 #include <ros/rate.h>
 
+#include <string>
+
 double resolution = 0.01;
 cv::Point2d canvas_center;
 
@@ -18,7 +20,11 @@ cv::Point2d worldToCanvas(double x, double y)
 
 int main(int argc, char **argv)
 {
-    emc::IO io;
+    std::string robot_name = "pico";
+    if (argc > 1)
+        robot_name=argv[1];
+
+    emc::IO io(robot_name);
 
     ros::Rate r(30);
     while(io.ok())
