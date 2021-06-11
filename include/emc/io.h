@@ -18,6 +18,7 @@ class IO
 public:
 
     IO(Communication* comm = 0);
+    IO(std::string robot_name);
 
     ~IO();
 

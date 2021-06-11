@@ -12,7 +12,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Communication::Communication()
+Communication::Communication(std::string robot_name)
 {
 
     ros::VP_string args;
@@ -21,21 +21,21 @@ Communication::Communication()
 
     ros::NodeHandle nh_laser;
     nh_laser.setCallbackQueue(&laser_cb_queue_);
-    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/pico/laser", 1, &Communication::laserCallback, this);
+    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/" + robot_name + "/laser", 1, &Communication::laserCallback, this);
 
     ros::NodeHandle nh_odom;
     nh_odom.setCallbackQueue(&odom_cb_queue_);
-    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/pico/odom", 1, &Communication::odomCallback, this);
+    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/" + robot_name + "/odom", 1, &Communication::odomCallback, this);
 
     ros::NodeHandle nh_ce;
     nh_ce.setCallbackQueue(&ce_cb_queue_);
-    sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/pico/controlEffort", 1, &Communication::controlEffortCallback, this);
+    sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, &Communication::controlEffortCallback, this);
 
-    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/pico/cmd_vel", 1);
+    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/" + robot_name + "/cmd_vel", 1);
 
-    pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/pico/open_door", 1);
+    pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
-    pub_speak_ = nh_laser.advertise<std_msgs::String>("/pico/speak", 1);
+    pub_speak_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/speak", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
