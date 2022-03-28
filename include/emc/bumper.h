@@ -1,17 +1,14 @@
-#ifndef EMC_SYSTEM_ODOM_H_
-#define EMC_SYSTEM_ODOM_H_
+#ifndef EMC_SYSTEM_BUMPER_H_
+#define EMC_SYSTEM_BUMPER_H_
 
 namespace emc
 {
 
 // ----------------------------------------------------------------------------------------------------
 
-struct OdometryData
+struct BumperData
 {
-    double x; // m
-    double y; // m
-    double a; // rad
-    double timestamp;
+    bool contact;
 };
 
 } // end namespace emc

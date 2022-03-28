@@ -3,11 +3,13 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/bumper.h"
 
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
 #include <ros/callback_queue.h>
 
+#include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
 #include <emc_system/controlEffort.h>
@@ -21,7 +23,7 @@ class Communication
 
 public:
 
-    Communication(std::string robot_name="pico");
+    Communication(std::string robot_name="hero");
 
     ~Communication();
 
@@ -31,7 +33,10 @@ public:
 
     bool readOdometryData(OdometryData& odom);
 
-    bool readControlEffort(ControlEffort& ce);
+    bool readFrontBumperData(BumperData& bumper);
+    bool readBackBumperData(BumperData& bumper);
+
+    //bool readControlEffort(ControlEffort& ce);
 
     void sendBaseVelocity(double vx, double vy, double va);
 
@@ -73,7 +78,21 @@ private:
 
     void odomCallback(const nav_msgs::OdometryConstPtr& msg);
 
+    // Bumper data
 
+    ros::CallbackQueue bumper_f_cb_queue_;
+    ros::CallbackQueue bumper_b_cb_queue_;
+
+    ros::Subscriber sub_bumper_f_;
+    ros::Subscriber sub_bumper_b_;
+
+    std_msgs::BoolConstPtr bumper_f_msg_;
+    std_msgs::BoolConstPtr bumper_b_msg_;
+
+    void bumperfCallback(const std_msgs::BoolConstPtr& msg);
+    void bumperbCallback(const std_msgs::BoolConstPtr& msg);
+
+/*
     // Control effort data
 
     ros::CallbackQueue ce_cb_queue_;
@@ -83,6 +102,7 @@ private:
     emc_system::controlEffortConstPtr ce_msg_;
 
     void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
+*/
 
 };
 

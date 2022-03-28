@@ -35,10 +35,22 @@ bool IO::readOdometryData(OdometryData& odom)
     return comm_->readOdometryData(odom);
 }  
 
+bool IO::readFrontBumperData(BumperData& bumper)
+{
+    return comm_->readFrontBumperData(bumper);
+}
+
+bool IO::readBackBumperData(BumperData& bumper)
+{
+    return comm_->readBackBumperData(bumper);
+}
+
+/*
 bool IO::readControlEffort(ControlEffort& ce)
 {
     return comm_->readControlEffort(ce);
 }
+*/
 
 void IO::sendBaseReference(double vx, double vy, double va)
 {

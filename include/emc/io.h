@@ -6,6 +6,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/bumper.h"
 
 namespace emc
 {
@@ -26,7 +27,10 @@ public:
 
     bool readOdometryData(OdometryData& odom);
 
-    bool readControlEffort(ControlEffort& ce);
+    bool readFrontBumperData(BumperData& bumper);
+    bool readBackBumperData(BumperData& bumper);
+
+    //bool readControlEffort(ControlEffort& ce);
 
     void sendBaseReference(double vx, double vy, double va);
 

@@ -68,6 +68,7 @@ add_library(emc_system
     include/emc/odom.h
     include/emc/io.h
     include/emc/rate.h
+    include/emc/bumper.h
 
     src/engine.cpp
     src/communication.cpp

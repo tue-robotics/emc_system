@@ -4,7 +4,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
-#include <emc_system/controlEffort.h>
+//#include <emc_system/controlEffort.h>
 #include <std_msgs/String.h>
 
 namespace emc
@@ -21,17 +21,18 @@ Communication::Communication(std::string robot_name)
 
     ros::NodeHandle nh_laser;
     nh_laser.setCallbackQueue(&laser_cb_queue_);
-    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/" + robot_name + "/laser", 1, &Communication::laserCallback, this);
+    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/" + robot_name + "/base_scan", 1, &Communication::laserCallback, this);
 
     ros::NodeHandle nh_odom;
     nh_odom.setCallbackQueue(&odom_cb_queue_);
-    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/" + robot_name + "/odom", 1, &Communication::odomCallback, this);
+    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/" + robot_name + "/base/measurements", 1, &Communication::odomCallback, this);
 
+    /*
     ros::NodeHandle nh_ce;
     nh_ce.setCallbackQueue(&ce_cb_queue_);
     sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, &Communication::controlEffortCallback, this);
-
-    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/" + robot_name + "/cmd_vel", 1);
+*/
+    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/" + robot_name + "/base/references", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
@@ -95,6 +96,36 @@ bool Communication::readOdometryData(OdometryData& odom)
 
 // ----------------------------------------------------------------------------------------------------
 
+bool Communication::readFrontBumperData(BumperData& bumper)
+{
+    bumper_f_msg_.reset();
+
+    bumper_f_cb_queue_.callAvailable();
+
+    if (!bumper_f_msg_)
+        return false;
+
+    bumper.contact = bumper_f_msg_->data;
+    return true;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+bool Communication::readBackBumperData(BumperData& bumper)
+{
+    bumper_b_msg_.reset();
+
+    bumper_b_cb_queue_.callAvailable();
+
+    if (!bumper_b_msg_)
+        return false;
+
+    bumper.contact = bumper_b_msg_->data;
+    return true;
+}
+
+// ----------------------------------------------------------------------------------------------------
+/*
 bool Communication::readControlEffort(ControlEffort& ce)
 {
     ce_msg_.reset();
@@ -111,7 +142,7 @@ bool Communication::readControlEffort(ControlEffort& ce)
 
     return true;
 }
-
+*/
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -158,10 +189,24 @@ void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
 
 // ----------------------------------------------------------------------------------------------------
 
+void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
+{
+    bumper_f_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
+{
+    bumper_b_msg_ = msg;
+}
+// ----------------------------------------------------------------------------------------------------
+/*
 void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
 {
     ce_msg_ = msg;
 }
+*/
 
 } // end namespace emc
 

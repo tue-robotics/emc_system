@@ -20,7 +20,7 @@ cv::Point2d worldToCanvas(double x, double y)
 
 int main(int argc, char **argv)
 {
-    std::string robot_name = "pico";
+    std::string robot_name = "hero";
     if (argc > 1)
         robot_name=argv[1];
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
             a += scan.angle_increment;
         }
 
-        cv::imshow("PICO Viz", canvas);
+        cv::imshow("Laser Vizualization", canvas);
         cv::waitKey(3);
 
         r.sleep();
