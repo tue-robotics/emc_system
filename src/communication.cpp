@@ -32,6 +32,15 @@ Communication::Communication(std::string robot_name)
     nh_ce.setCallbackQueue(&ce_cb_queue_);
     sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, &Communication::controlEffortCallback, this);
 */
+
+    ros::NodeHandle nh_bumper_f;
+    nh_bumper_f.setCallbackQueue(&bumper_f_cb_queue_);
+    sub_bumper_f_ = nh_bumper_f.subscribe<std_msgs::Bool>("/" + robot_name + "/base_f_bumper_sensor", 1, &Communication::bumperfCallback, this);
+
+    ros::NodeHandle nh_bumper_b;
+    nh_bumper_b.setCallbackQueue(&bumper_b_cb_queue_);
+    sub_bumper_b_ = nh_bumper_b.subscribe<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, &Communication::bumperbCallback, this);
+
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/" + robot_name + "/base/references", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
