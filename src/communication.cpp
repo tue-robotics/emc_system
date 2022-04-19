@@ -45,7 +45,7 @@ Communication::Communication(std::string robot_name)
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
-    pub_speak_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/speak", 1);
+    pub_speak_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
