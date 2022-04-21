@@ -33,16 +33,17 @@ int main(int argc, char **argv)
         canvas_center = cv::Point2d(canvas.rows / 2, canvas.cols / 2);
 
         cv::Scalar robot_color(0, 0, 255);
-
         std::vector<std::pair<double, double> > robot_points;
-        robot_points.push_back(std::pair<double, double>( 0.1,  -0.2));
-        robot_points.push_back(std::pair<double, double>( 0.1,  -0.1));
-        robot_points.push_back(std::pair<double, double>( 0.05, -0.1));
-        robot_points.push_back(std::pair<double, double>( 0.05,  0.1));
-        robot_points.push_back(std::pair<double, double>( 0.1,   0.1));
-        robot_points.push_back(std::pair<double, double>( 0.1,   0.2));
-        robot_points.push_back(std::pair<double, double>(-0.1,   0.2));
-        robot_points.push_back(std::pair<double, double>(-0.1,  -0.2));
+
+        int nCorners = 32;
+        double radius = 0.27;
+        double x, y, theta;
+        for (unsigned int i = 0; i < nCorners; i++) {
+            theta = 2*M_PI*i/nCorners;
+            x = radius*cos(theta);
+            y = radius*sin(theta);
+            robot_points.push_back(std::pair<double, double>(x,y));
+        }
 
         for(unsigned int i = 0; i < robot_points.size(); ++i)
         {
@@ -51,6 +52,41 @@ int main(int argc, char **argv)
             cv::Point2d p2 = worldToCanvas(robot_points[j].first, robot_points[j].second);
             cv::line(canvas, p1, p2, robot_color, 2);
         }
+
+        std::vector<std::pair<double, double> > robot_head_points;
+        std::vector<std::pair<double, double> > eye_points;
+        std::vector<std::pair<double, double> > eye_pupil_points;
+
+        robot_head_points.push_back(std::pair<double, double>( 0.075, -0.175));
+        robot_head_points.push_back(std::pair<double, double>( 0.075,  0.175));
+        robot_head_points.push_back(std::pair<double, double>(-0.075,  0.175));
+        robot_head_points.push_back(std::pair<double, double>(-0.075, -0.175));
+        eye_points.push_back(std::pair<double, double>( 0.0,  0.075));
+        eye_points.push_back(std::pair<double, double>( 0.0, -0.075));
+        eye_pupil_points.push_back(std::pair<double, double>( 0.015,  0.075));
+        eye_pupil_points.push_back(std::pair<double, double>( 0.015, -0.075));
+
+        for(unsigned int i = 0; i < robot_head_points.size(); ++i)
+        {
+            unsigned int j = (i + 1) % robot_head_points.size();
+            cv::Point2d p1 = worldToCanvas(robot_head_points[i].first, robot_head_points[i].second);
+            cv::Point2d p2 = worldToCanvas(robot_head_points[j].first, robot_head_points[j].second);
+            cv::line(canvas, p1, p2, robot_color, 2);
+        }
+        for(unsigned int i = 0; i < eye_points.size(); ++i)
+        {
+            cv::Point2d pEye = worldToCanvas(eye_points[i].first, eye_points[i].second);
+            cv::circle(canvas, pEye, 4, robot_color, 2);
+        }
+        for(unsigned int i = 0; i < eye_pupil_points.size(); ++i)
+        {
+            cv::Point2d pEyePupil = worldToCanvas(eye_pupil_points[i].first, eye_pupil_points[i].second);
+            cv::circle(canvas, pEyePupil, 1, robot_color, 2);
+        }
+
+        // Dot to indicate LRF position
+        cv::Point2d pLRF = worldToCanvas(0.175, 0.0);
+        cv::circle(canvas, pLRF, 2, robot_color, 2);
 
         emc::LaserData scan;
         if (!io.readLaserData(scan))
