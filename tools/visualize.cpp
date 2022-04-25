@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         std::vector<std::pair<double, double> > robot_points;
 
         int nCorners = 32;
-        double radius = 0.27;
+        double radius = 0.21;
         double x, y, theta;
         for (unsigned int i = 0; i < nCorners; i++) {
             theta = 2*M_PI*i/nCorners;
