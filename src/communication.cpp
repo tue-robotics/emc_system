@@ -158,6 +158,14 @@ bool Communication::readControlEffort(ControlEffort& ce)
 void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
     geometry_msgs::Twist ref;
+    double XLIMIT = 0.22;
+    double YLIMIT = XLIMIT;
+    double ALIMIT = 1.2;
+    // Map value between + and - range
+    vx = (vx < 0) ? std::max(vx,-XLIMIT) : std::min(vx,XLIMIT);
+    vy = (vy < 0) ? std::max(vy,-YLIMIT) : std::min(vy,YLIMIT);
+    va = (va < 0) ? std::max(va,-ALIMIT) : std::min(va,ALIMIT);
+    
     ref.linear.x = vx;
     ref.linear.y = vy;
     ref.angular.z = va;
