@@ -21,11 +21,11 @@ Communication::Communication(std::string robot_name)
 
     ros::NodeHandle nh_laser;
     nh_laser.setCallbackQueue(&laser_cb_queue_);
-    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/" + robot_name + "/base_scan", 1, &Communication::laserCallback, this);
+    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/scan", 1, &Communication::laserCallback, this);
 
     ros::NodeHandle nh_odom;
     nh_odom.setCallbackQueue(&odom_cb_queue_);
-    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/" + robot_name + "/base/measurements", 1, &Communication::odomCallback, this);
+    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/odom", 1, &Communication::odomCallback, this);
 
     /*
     ros::NodeHandle nh_ce;
@@ -41,7 +41,7 @@ Communication::Communication(std::string robot_name)
     nh_bumper_b.setCallbackQueue(&bumper_b_cb_queue_);
     sub_bumper_b_ = nh_bumper_b.subscribe<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, &Communication::bumperbCallback, this);
 
-    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/" + robot_name + "/base/references", 1);
+    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
