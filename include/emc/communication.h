@@ -23,7 +23,7 @@ class Communication
 
 public:
 
-    Communication(std::string robot_name="rosbot");
+    Communication(std::string robot_name="pyro");
 
     ~Communication();
 
