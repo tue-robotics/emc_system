@@ -9,7 +9,8 @@
 double resolution = 0.01;
 cv::Point2d canvas_center;
 
-double robotRadius = 0.21; // [m]
+const bool draw_robot = false;
+double robotRadius = 0.21; // HERO radius [m]
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -39,44 +40,47 @@ int main(int argc, char **argv)
         // scaling of the head and LRF (which should be drawn inside the circumference of the robot)
         const double scaling = 1.0;
 
-        std::vector<std::pair<double, double> > robot_points;
-        std::vector<std::pair<double, double> > robot_head_points;
-        std::vector<std::pair<double, double> > eye_points;
-        std::vector<std::pair<double, double> > eye_pupil_points;
+        if (draw_robot) {
+            std::vector<std::pair<double, double> > robot_points;
+            std::vector<std::pair<double, double> > robot_head_points;
+            std::vector<std::pair<double, double> > eye_points;
+            std::vector<std::pair<double, double> > eye_pupil_points;
 
-        robot_points.push_back(std::pair<double, double>(0.0,0.0));
-        robot_head_points.push_back(std::pair<double, double>( 0.08*scaling, -0.16*scaling));
-        robot_head_points.push_back(std::pair<double, double>( 0.08*scaling,  0.16*scaling));
-        robot_head_points.push_back(std::pair<double, double>(-0.08*scaling,  0.16*scaling));
-        robot_head_points.push_back(std::pair<double, double>(-0.08*scaling, -0.16*scaling));
-        eye_points.push_back(std::pair<double, double>( 0.0*scaling,  0.07*scaling));
-        eye_points.push_back(std::pair<double, double>( 0.0*scaling, -0.07*scaling));
-        eye_pupil_points.push_back(std::pair<double, double>( 0.025*scaling,  0.07*scaling));
-        eye_pupil_points.push_back(std::pair<double, double>( 0.025*scaling, -0.07*scaling));
+            robot_points.push_back(std::pair<double, double>(0.0,0.0));
+            robot_head_points.push_back(std::pair<double, double>( 0.08*scaling, -0.16*scaling));
+            robot_head_points.push_back(std::pair<double, double>( 0.08*scaling,  0.16*scaling));
+            robot_head_points.push_back(std::pair<double, double>(-0.08*scaling,  0.16*scaling));
+            robot_head_points.push_back(std::pair<double, double>(-0.08*scaling, -0.16*scaling));
+            eye_points.push_back(std::pair<double, double>( 0.0*scaling,  0.07*scaling));
+            eye_points.push_back(std::pair<double, double>( 0.0*scaling, -0.07*scaling));
+            eye_pupil_points.push_back(std::pair<double, double>( 0.025*scaling,  0.07*scaling));
+            eye_pupil_points.push_back(std::pair<double, double>( 0.025*scaling, -0.07*scaling));
 
-        cv::Point2d pRobot = worldToCanvas(robot_points[0].first, robot_points[0].second);
-        cv::circle(canvas, pRobot, robotRadius/resolution, robot_color, 2);
+            cv::Point2d pRobot = worldToCanvas(robot_points[0].first, robot_points[0].second);
+            cv::circle(canvas, pRobot, robotRadius/resolution, robot_color, 2);
 
-        for(unsigned int i = 0; i < robot_head_points.size(); ++i)
-        {
-            unsigned int j = (i + 1) % robot_head_points.size();
-            cv::Point2d p1 = worldToCanvas(robot_head_points[i].first, robot_head_points[i].second);
-            cv::Point2d p2 = worldToCanvas(robot_head_points[j].first, robot_head_points[j].second);
-            cv::line(canvas, p1, p2, robot_color, 2);
-        }
-        for(unsigned int i = 0; i < eye_points.size(); ++i)
-        {
-            cv::Point2d pEye = worldToCanvas(eye_points[i].first, eye_points[i].second);
-            cv::circle(canvas, pEye, scaling*4, robot_color, 2);
-        }
-        for(unsigned int i = 0; i < eye_pupil_points.size(); ++i)
-        {
-            cv::Point2d pEyePupil = worldToCanvas(eye_pupil_points[i].first, eye_pupil_points[i].second);
-            cv::circle(canvas, pEyePupil, scaling*1.5, robot_color, 2);
+            for(unsigned int i = 0; i < robot_head_points.size(); ++i)
+            {
+                unsigned int j = (i + 1) % robot_head_points.size();
+                cv::Point2d p1 = worldToCanvas(robot_head_points[i].first, robot_head_points[i].second);
+                cv::Point2d p2 = worldToCanvas(robot_head_points[j].first, robot_head_points[j].second);
+                cv::line(canvas, p1, p2, robot_color, 2);
+            }
+            for(unsigned int i = 0; i < eye_points.size(); ++i)
+            {
+                cv::Point2d pEye = worldToCanvas(eye_points[i].first, eye_points[i].second);
+                cv::circle(canvas, pEye, scaling*4, robot_color, 2);
+            }
+            for(unsigned int i = 0; i < eye_pupil_points.size(); ++i)
+            {
+                cv::Point2d pEyePupil = worldToCanvas(eye_pupil_points[i].first, eye_pupil_points[i].second);
+                cv::circle(canvas, pEyePupil, scaling*1.5, robot_color, 2);
+            }
         }
 
         // Dot to indicate LRF position
         cv::Point2d pLRF = worldToCanvas(0.15*scaling, 0.0*scaling);
+        if (!draw_robot) pLRF = worldToCanvas(0.0*scaling, 0.0*scaling);
         cv::circle(canvas, pLRF, scaling*2, robot_color, 2);
 
         emc::LaserData scan;
