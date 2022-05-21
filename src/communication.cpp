@@ -21,7 +21,7 @@ Communication::Communication(std::string robot_name)
 
     ros::NodeHandle nh_laser;
     nh_laser.setCallbackQueue(&laser_cb_queue_);
-    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/scan", 1, &Communication::laserCallback, this);
+    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/transformed_scan", 1, &Communication::laserCallback, this);
 
     ros::NodeHandle nh_odom;
     nh_odom.setCallbackQueue(&odom_cb_queue_);
