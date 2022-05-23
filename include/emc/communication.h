@@ -13,6 +13,8 @@
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
 #include <emc_system/controlEffort.h>
+
+#include <sensor_msgs/Range.h>
 #include <string>
 
 namespace emc
@@ -80,17 +82,26 @@ private:
 
     // Bumper data
 
-    ros::CallbackQueue bumper_f_cb_queue_;
-    ros::CallbackQueue bumper_b_cb_queue_;
+    ros::CallbackQueue bumper_fl_cb_queue_;
+    ros::CallbackQueue bumper_fr_cb_queue_;
+    ros::CallbackQueue bumper_bl_cb_queue_;
+    ros::CallbackQueue bumper_br_cb_queue_;
 
-    ros::Subscriber sub_bumper_f_;
-    ros::Subscriber sub_bumper_b_;
+    ros::Subscriber sub_bumper_fl_;
+    ros::Subscriber sub_bumper_fr_;
+    ros::Subscriber sub_bumper_bl_;
+    ros::Subscriber sub_bumper_br_;
 
-    std_msgs::BoolConstPtr bumper_f_msg_;
-    std_msgs::BoolConstPtr bumper_b_msg_;
+    sensor_msgs::RangeConstPtr bumper_fl_msg_;
+    sensor_msgs::RangeConstPtr bumper_fr_msg_;    
+    sensor_msgs::RangeConstPtr bumper_bl_msg_;
+    sensor_msgs::RangeConstPtr bumper_br_msg_;
 
-    void bumperfCallback(const std_msgs::BoolConstPtr& msg);
-    void bumperbCallback(const std_msgs::BoolConstPtr& msg);
+    void bumperflCallback(const sensor_msgs::RangeConstPtr& msg);
+    void bumperfrCallback(const sensor_msgs::RangeConstPtr& msg);
+    void bumperblCallback(const sensor_msgs::RangeConstPtr& msg);
+    void bumperbrCallback(const sensor_msgs::RangeConstPtr& msg);
+
 
 /*
     // Control effort data

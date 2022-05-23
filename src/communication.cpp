@@ -7,6 +7,8 @@
 //#include <emc_system/controlEffort.h>
 #include <std_msgs/String.h>
 
+#include <sensor_msgs/Range.h>
+
 #include <math.h>
 
 namespace emc
@@ -35,13 +37,21 @@ Communication::Communication(std::string robot_name)
     sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, &Communication::controlEffortCallback, this);
 */
 
-    ros::NodeHandle nh_bumper_f;
-    nh_bumper_f.setCallbackQueue(&bumper_f_cb_queue_);
-    sub_bumper_f_ = nh_bumper_f.subscribe<std_msgs::Bool>("/" + robot_name + "/base_f_bumper_sensor", 1, &Communication::bumperfCallback, this);
+    ros::NodeHandle nh_bumper_fl;
+    nh_bumper_fl.setCallbackQueue(&bumper_fl_cb_queue_);
+    sub_bumper_fl_ = nh_bumper_fl.subscribe<sensor_msgs::Range>("/range/fl", 1, &Communication::bumperflCallback, this);
+    
+    ros::NodeHandle nh_bumper_fr;
+    nh_bumper_fr.setCallbackQueue(&bumper_fr_cb_queue_);
+    sub_bumper_fr_ = nh_bumper_fr.subscribe<sensor_msgs::Range>("/range/fr", 1, &Communication::bumperfrCallback, this);
 
-    ros::NodeHandle nh_bumper_b;
-    nh_bumper_b.setCallbackQueue(&bumper_b_cb_queue_);
-    sub_bumper_b_ = nh_bumper_b.subscribe<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, &Communication::bumperbCallback, this);
+     ros::NodeHandle nh_bumper_bl;
+    nh_bumper_bl.setCallbackQueue(&bumper_bl_cb_queue_);
+    sub_bumper_bl_ = nh_bumper_bl.subscribe<sensor_msgs::Range>("/range/bl", 1, &Communication::bumperblCallback, this);
+    
+    ros::NodeHandle nh_bumper_br;
+    nh_bumper_br.setCallbackQueue(&bumper_br_cb_queue_);
+    sub_bumper_br_ = nh_bumper_br.subscribe<sensor_msgs::Range>("/range/br", 1, &Communication::bumperbrCallback, this);
 
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
@@ -109,14 +119,17 @@ bool Communication::readOdometryData(OdometryData& odom)
 
 bool Communication::readFrontBumperData(BumperData& bumper)
 {
-    bumper_f_msg_.reset();
+    bumper_fl_msg_.reset();
+    bumper_fr_msg_.reset();
 
-    bumper_f_cb_queue_.callAvailable();
+    bumper_fl_cb_queue_.callAvailable();
+    bumper_fr_cb_queue_.callAvailable();
 
-    if (!bumper_f_msg_)
+    if (!bumper_fl_msg_ && !bumper_fr_msg_)
         return false;
 
-    bumper.contact = bumper_f_msg_->data;
+    bumper.contact = bumper_fl_msg_->range < 1; 
+    bumper.contact = bumper.contact || bumper_fr_msg_->range < 1 ;
     return true;
 }
 
@@ -124,16 +137,20 @@ bool Communication::readFrontBumperData(BumperData& bumper)
 
 bool Communication::readBackBumperData(BumperData& bumper)
 {
-    bumper_b_msg_.reset();
+    bumper_bl_msg_.reset();
+    bumper_br_msg_.reset();
 
-    bumper_b_cb_queue_.callAvailable();
+    bumper_bl_cb_queue_.callAvailable();
+    bumper_br_cb_queue_.callAvailable();
 
-    if (!bumper_b_msg_)
+    if (!bumper_bl_msg_ && !bumper_br_msg_)
         return false;
 
-    bumper.contact = bumper_b_msg_->data;
+    bumper.contact = bumper_bl_msg_->range < 1; 
+    bumper.contact = bumper.contact || bumper_br_msg_->range < 1 ;
     return true;
 }
+
 
 // ----------------------------------------------------------------------------------------------------
 /*
@@ -200,17 +217,34 @@ void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
+void Communication::bumperflCallback(const sensor_msgs::RangeConstPtr& msg)
 {
-    bumper_f_msg_ = msg;
+    bumper_fl_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
+void Communication::bumperfrCallback(const sensor_msgs::RangeConstPtr& msg)
 {
-    bumper_b_msg_ = msg;
+    bumper_fr_msg_ = msg;
 }
+
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::bumperblCallback(const sensor_msgs::RangeConstPtr& msg)
+{
+    bumper_bl_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::bumperbrCallback(const sensor_msgs::RangeConstPtr& msg)
+{
+    bumper_br_msg_ = msg;
+}
+
+
 // ----------------------------------------------------------------------------------------------------
 /*
 void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
