@@ -4,6 +4,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/Bool.h>
 //#include <emc_system/controlEffort.h>
 #include <std_msgs/String.h>
 
@@ -54,6 +55,8 @@ Communication::Communication(std::string robot_name)
     sub_bumper_br_ = nh_bumper_br.subscribe<sensor_msgs::Range>("/range/br", 1, &Communication::bumperbrCallback, this);
 
     pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    
+    pub_bumperf_  = nh_laser.advertise<std_msgs::Bool>("/" + robot_name + "/bumperf",1);
 
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
@@ -171,6 +174,13 @@ bool Communication::readControlEffort(ControlEffort& ce)
     return true;
 }
 */
+
+void Communication::pubFrontBumperData(bool contact)
+{
+	std_msgs::Bool msg;
+	msg.data = contact;
+	pub_bumperf_.publish(msg);
+}
 
 // ----------------------------------------------------------------------------------------------------
 

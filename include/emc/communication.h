@@ -43,6 +43,8 @@ public:
     void sendBaseVelocity(double vx, double vy, double va);
 
     void sendOpendoorRequest();
+    
+    void pubFrontBumperData(bool contact);
 
     void speak(const std::string& text);
 
@@ -55,8 +57,9 @@ private:
     ros::Publisher pub_open_door_;
 
     ros::Publisher pub_speak_;
-
     
+    ros::Publisher pub_bumperf_;
+    ros::Publisher pub_bumperb_;    
 
 
     // Laser data
