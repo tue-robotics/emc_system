@@ -75,6 +75,11 @@ void IO::speak(const std::string& text)
     comm_->speak(text);
 }
 
+void IO::play(const std::string& file)
+{
+    comm_->speak(file);
+}
+
 bool IO::ok()
 {
     return ros::ok();

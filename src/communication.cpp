@@ -46,6 +46,7 @@ Communication::Communication(std::string robot_name)
     pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
     pub_speak_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
+    pub_play_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -180,6 +181,13 @@ void Communication::speak(const std::string& text)
     std_msgs::String str;
     str.data = text;
     pub_speak_.publish(str);
+}
+
+void Communication::play(const std::string& file)
+{
+    std_msgs::String str;
+    str.data = file;
+    pub_play_.publish(str);
 }
 
 // ----------------------------------------------------------------------------------------------------
