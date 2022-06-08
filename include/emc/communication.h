@@ -43,6 +43,8 @@ public:
     void sendOpendoorRequest();
 
     void speak(const std::string& text);
+    
+    void play(const std::string& file);
 
 private:
 
@@ -53,8 +55,8 @@ private:
     ros::Publisher pub_open_door_;
 
     ros::Publisher pub_speak_;
-
     
+    ros::Publisher pub_play_;
 
 
     // Laser data

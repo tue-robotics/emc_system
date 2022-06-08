@@ -39,6 +39,8 @@ public:
     bool ok();
 
     void speak(const std::string& text);
+    
+    void play(const std::string& file);
 
 private:
 
