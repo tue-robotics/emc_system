@@ -77,7 +77,7 @@ void IO::speak(const std::string& text)
 
 void IO::play(const std::string& file)
 {
-    comm_->speak(file);
+    comm_->play(file);
 }
 
 bool IO::ok()
