@@ -59,8 +59,10 @@ void IO::sendBaseReference(double vx, double vy, double va)
 
 void IO::sendOpendoorRequest()
 {
-    int dummy;
-    dummy = system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-result"
+    system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+    #pragma GCC diagnostic pop
      
     comm_->sendOpendoorRequest();
 }

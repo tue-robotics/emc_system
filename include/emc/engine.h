@@ -9,8 +9,10 @@
 
 namespace emc
 {
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 static const char* no_event = 0;
+#pragma GCC diagnostic push
 
 typedef void (*state_function)(FSMInterface&, IO& io, void* user_data);
 
