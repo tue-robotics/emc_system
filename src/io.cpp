@@ -15,14 +15,14 @@ IO::IO(Communication* comm) : comm_(comm)
         comm_ = new Communication;
 }
 
-IO::IO(std::string robot_name)
+IO::IO(std::string robot_name) : comm_(new Communication(robot_name))
 {
-    comm_ = new Communication(robot_name);
 }
 
 IO::~IO()
 {
-    delete comm_;
+    if (comm_)
+        delete comm_;
 }
 
 bool IO::readLaserData(LaserData& scan)

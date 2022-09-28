@@ -9,7 +9,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Engine::Engine() : io_(0), state_(-1), user_data_(nullptr), loop_freq_(0), has_error_(false)
+Engine::Engine() : io_(nullptr), state_(-1), user_data_(nullptr), loop_freq_(0), has_error_(false)
 {
     // Register the special 'null' event
     events.push_back("NO_EVENT");
@@ -20,7 +20,8 @@ Engine::Engine() : io_(0), state_(-1), user_data_(nullptr), loop_freq_(0), has_e
 
 Engine::~Engine()
 {
-    delete io_;
+    if (io_)
+        delete io_;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -43,6 +44,9 @@ void Engine::run()
     }
 
 //    comm_->init();
+    if (io_)
+        delete io_;
+
     io_ = new IO;
 
     ros::Rate r(loop_freq_);
