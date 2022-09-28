@@ -9,7 +9,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Engine::Engine() : io_(0), state_(-1), has_error_(false), loop_freq_(0), user_data_(0)
+Engine::Engine() : io_(0), state_(-1), user_data_(nullptr), loop_freq_(0), has_error_(false)
 {
     // Register the special 'null' event
     events.push_back("NO_EVENT");
