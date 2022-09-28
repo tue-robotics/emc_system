@@ -11,6 +11,12 @@ Rate::Rate(double freq)
     rate_ = new ros::Rate(freq);
 }
 
+Rate::~Rate()
+{
+    if (rate_)
+        delete rate_;
+}
+
 void Rate::sleep()
 {
     rate_->sleep();
