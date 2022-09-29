@@ -1,11 +1,13 @@
 #include "emc/communication.h"
 
 #include <ros/node_handle.h>
+#include <ros/subscribe_options.h>
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
-//#include <emc_system/controlEffort.h>
 #include <std_msgs/String.h>
+
+//#include <emc_system/controlEffort.h
 
 namespace emc
 {
@@ -19,34 +21,30 @@ Communication::Communication(std::string robot_name)
     ros::init(args, "emc_system", ros::init_options::AnonymousName);
     ros::Time::init();
 
-    ros::NodeHandle nh_laser;
-    nh_laser.setCallbackQueue(&laser_cb_queue_);
-    sub_laser_ = nh_laser.subscribe<sensor_msgs::LaserScan>("/transformed_scan", 1, &Communication::laserCallback, this);
+    ros::NodeHandle nh;
+    ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>("/transformed_scan", 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
+    sub_laser_ = nh.subscribe(laser_sub_options);
 
-    ros::NodeHandle nh_odom;
-    nh_odom.setCallbackQueue(&odom_cb_queue_);
-    sub_odom_ = nh_odom.subscribe<nav_msgs::Odometry>("/odom", 1, &Communication::odomCallback, this);
+    ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>("/odom", 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
+    sub_odom_ = nh.subscribe(odom_sub_options);
 
     /*
-    ros::NodeHandle nh_ce;
-    nh_ce.setCallbackQueue(&ce_cb_queue_);
-    sub_ce_ = nh_ce.subscribe<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, &Communication::controlEffortCallback, this);
-*/
+    ros::SubscribeOptions ce_sub_options = ros::SubscribeOptions::create<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, boost::bind(&Communication::controlEffortCallback, this, _1), ros::VoidPtr(), &ce_cb_queue_);
+    sub_ce_ = nh.subscribe(ce_sub_options);
+    */
 
-    ros::NodeHandle nh_bumper_f;
-    nh_bumper_f.setCallbackQueue(&bumper_f_cb_queue_);
-    sub_bumper_f_ = nh_bumper_f.subscribe<std_msgs::Bool>("/" + robot_name + "/base_f_bumper_sensor", 1, &Communication::bumperfCallback, this);
+    ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>("/" + robot_name + "/base_f_bumper_sensor", 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
+    sub_bumper_f_ = nh.subscribe(bumper_f_sub_options);
 
-    ros::NodeHandle nh_bumper_b;
-    nh_bumper_b.setCallbackQueue(&bumper_b_cb_queue_);
-    sub_bumper_b_ = nh_bumper_b.subscribe<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, &Communication::bumperbCallback, this);
+    ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
+    sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
 
-    pub_base_ref_ = nh_laser.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
-    pub_open_door_ = nh_laser.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
+    pub_open_door_ = nh.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
 
-    pub_speak_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
-    pub_play_ = nh_laser.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
+    pub_speak_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
+    pub_play_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
