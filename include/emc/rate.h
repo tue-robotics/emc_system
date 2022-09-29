@@ -16,6 +16,8 @@ public:
 
     Rate(double freq);
 
+    ~Rate();
+
     void sleep();
 
 private:

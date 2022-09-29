@@ -27,7 +27,7 @@ double calculateMinimumDistance(const emc::LaserData& scan)
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_initialize(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
+void state_initialize(emc::FSMInterface& fsm, emc::IO& /*io*/, void* /*user_data*/)
 {
     std::cout << "initializing..." << std::endl;
 

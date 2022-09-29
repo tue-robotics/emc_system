@@ -15,14 +15,14 @@ IO::IO(Communication* comm) : comm_(comm)
         comm_ = new Communication;
 }
 
-IO::IO(std::string robot_name)
+IO::IO(std::string robot_name) : comm_(new Communication(robot_name))
 {
-    comm_ = new Communication(robot_name);
 }
 
 IO::~IO()
 {
-    delete comm_;
+    if (comm_)
+        delete comm_;
 }
 
 bool IO::readLaserData(LaserData& scan)
@@ -59,8 +59,10 @@ void IO::sendBaseReference(double vx, double vy, double va)
 
 void IO::sendOpendoorRequest()
 {
-    int dummy;
-    dummy = system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-result"
+    system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+    #pragma GCC diagnostic pop
      
     comm_->sendOpendoorRequest();
 }
