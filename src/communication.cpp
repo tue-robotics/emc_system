@@ -6,6 +6,7 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/String.h>
+#include <string>
 
 //#include <emc_system/controlEffort.h
 
@@ -14,7 +15,7 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Communication::Communication(std::string robot_name)
+Communication::Communication(std::string /*robot_name*/)
 {
 
     ros::VP_string args;
@@ -22,10 +23,20 @@ Communication::Communication(std::string robot_name)
     ros::Time::init();
 
     ros::NodeHandle nh;
-    ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>("/transformed_scan", 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
+    std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
+    if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter "<<"laser_"<<" not set");};
+    if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter "<<"odom_"<<" not set");};
+    if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter "<<"bumper_f_"<<" not set");};
+    if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter "<<"bumper_b_"<<" not set");};
+    if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter "<<"base_ref_"<<" not set");};
+    if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter "<<"open_door_"<<" not set");};
+    if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter "<<"speak_"<<" not set");};
+    if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter "<<"play_"<<" not set");};
+
+    ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
     sub_laser_ = nh.subscribe(laser_sub_options);
 
-    ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>("/odom", 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
+    ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>(odom_param, 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
     sub_odom_ = nh.subscribe(odom_sub_options);
 
     /*
@@ -33,18 +44,18 @@ Communication::Communication(std::string robot_name)
     sub_ce_ = nh.subscribe(ce_sub_options);
     */
 
-    ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>("/" + robot_name + "/base_f_bumper_sensor", 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
+    ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_f_param, 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
     sub_bumper_f_ = nh.subscribe(bumper_f_sub_options);
 
-    ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>("/" + robot_name + "/base_b_bumper_sensor", 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
+    ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
     sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
 
-    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
 
-    pub_open_door_ = nh.advertise<std_msgs::Empty>("/" + robot_name + "/open_door", 1);
+    pub_open_door_ = nh.advertise<std_msgs::Empty>(open_door_param, 1);
 
-    pub_speak_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
-    pub_play_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
+    pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
+    pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
