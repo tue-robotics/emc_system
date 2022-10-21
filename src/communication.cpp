@@ -24,14 +24,14 @@ Communication::Communication(std::string /*robot_name*/)
 
     ros::NodeHandle nh;
     std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
-    if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter "<<"laser_"<<" not set");};
-    if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter "<<"odom_"<<" not set");};
-    if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter "<<"bumper_f_"<<" not set");};
-    if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter "<<"bumper_b_"<<" not set");};
-    if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter "<<"base_ref_"<<" not set");};
-    if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter "<<"open_door_"<<" not set");};
-    if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter "<<"speak_"<<" not set");};
-    if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter "<<"play_"<<" not set");};
+    if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
+    if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
+    if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
+    if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_b_" << " not set");};
+    if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter " << "base_ref_" << " not set");};
+    if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter " << "open_door_" << " not set");};
+    if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
+    if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
 
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
     sub_laser_ = nh.subscribe(laser_sub_options);
