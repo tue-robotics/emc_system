@@ -46,7 +46,7 @@ Communication::Communication(std::string robot_name)
     pub_speak_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
     pub_play_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
 
-    pub_marker_msg_ = nh.advertise<std_msgs::String>("/" + robot_name + "/student_markers", 1);
+    pub_marker_msg_ = nh.advertise<visualization_msgs::MarkerArray>("/" + robot_name + "/student_markers", 1);
     init_marker_message();
 }
 
@@ -235,11 +235,13 @@ void Communication::init_marker_message()
 
     _empty_marker_msg.id = 0;
     _empty_marker_msg.type = visualization_msgs::Marker::SPHERE;
-    _empty_marker_msg.action = visualization_msgs::Marker::ADD;
+    _empty_marker_msg.action = visualization_msgs::Marker::MODIFY;
 
     _empty_marker_msg.scale.x = 0.1;
     _empty_marker_msg.scale.y = 0.1;
     _empty_marker_msg.scale.z = 0.1;
+
+    _empty_marker_msg.pose.orientation.w = 1;
 
     _empty_marker_msg.color.r = 1;
     _empty_marker_msg.color.g = 0;
@@ -257,6 +259,7 @@ void Communication::addMarker(const Point &point)
     new_marker.pose.position.z = point.z;
 
     _marker_array_msg.markers.push_back(new_marker);
+    _empty_marker_msg.id += 1;
 }
 
 void Communication::sendMarkers()
@@ -266,6 +269,7 @@ void Communication::sendMarkers()
 
 void Communication::resetMarkers()
 {
+    _empty_marker_msg.id = 0;
     _marker_array_msg.markers.clear();   
 }
 

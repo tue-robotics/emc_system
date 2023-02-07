@@ -42,6 +42,12 @@ public:
     
     void play(const std::string& file);
 
+    void resetMarkers();
+
+    void addMarker(const Point &point);
+
+    void sendMarkers();
+
 private:
 
     Communication* comm_;

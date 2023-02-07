@@ -87,4 +87,18 @@ bool IO::ok()
     return ros::ok();
 }
 
+void IO::resetMarkers()
+{
+    comm_->resetMarkers();
+}
+
+void IO::addMarker(const Point &point)
+{
+    comm_->addMarker(point);
+}
+
+void IO::sendMarkers()
+{
+    comm_->sendMarkers();
+}
 }
