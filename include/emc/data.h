@@ -11,6 +11,13 @@ class Communication;
 
 // ----------------------------------------------------------------------------------------------------
 
+struct Point 
+{
+    double x;
+    double y;
+    double z;
+};
+
 struct LaserData
 {
     double range_min;

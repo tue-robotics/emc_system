@@ -45,6 +45,9 @@ Communication::Communication(std::string robot_name)
 
     pub_speak_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/input", 1);
     pub_play_ = nh.advertise<std_msgs::String>("/" + robot_name + "/text_to_speech/file", 1);
+
+    pub_marker_msg_ = nh.advertise<std_msgs::String>("/" + robot_name + "/student_markers", 1);
+    init_marker_message();
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -217,11 +220,53 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 }
 // ----------------------------------------------------------------------------------------------------
 /*
-void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
+void Communication::controlEffortCallback(const emc_systems::controlEffortConstPtr& msg)
 {
     ce_msg_ = msg;
 }
 */
 
-} // end namespace emc
 
+void Communication::init_marker_message()
+{
+    _marker_array_msg.markers.clear();
+    _empty_marker_msg.header.frame_id = "base_link";
+    _empty_marker_msg.header.stamp = ros::Time::now();
+
+    _empty_marker_msg.id = 0;
+    _empty_marker_msg.type = visualization_msgs::Marker::SPHERE;
+    _empty_marker_msg.action = visualization_msgs::Marker::ADD;
+
+    _empty_marker_msg.scale.x = 0.1;
+    _empty_marker_msg.scale.y = 0.1;
+    _empty_marker_msg.scale.z = 0.1;
+
+    _empty_marker_msg.color.r = 1;
+    _empty_marker_msg.color.g = 0;
+    _empty_marker_msg.color.b = 0;
+    _empty_marker_msg.color.a = 1;
+}
+
+void Communication::addMarker(const Point &point)
+{
+     // Make a copy to prevent altering the default config
+    visualization_msgs::Marker new_marker = _empty_marker_msg;
+
+    new_marker.pose.position.x = point.x;
+    new_marker.pose.position.y = point.y;
+    new_marker.pose.position.z = point.z;
+
+    _marker_array_msg.markers.push_back(new_marker);
+}
+
+void Communication::sendMarkers()
+{
+    pub_marker_msg_.publish(_marker_array_msg);
+}
+
+void Communication::resetMarkers()
+{
+    _marker_array_msg.markers.clear();   
+}
+
+} // end namespace emc

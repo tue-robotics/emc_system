@@ -13,6 +13,10 @@
 #include <sensor_msgs/LaserScan.h>
 #include <nav_msgs/Odometry.h>
 #include <emc_system/controlEffort.h>
+
+#include <geometry_msgs/Pose.h>
+#include <visualization_msgs/MarkerArray.h>
+
 #include <string>
 
 namespace emc
@@ -36,6 +40,12 @@ public:
     bool readFrontBumperData(BumperData& bumper);
     bool readBackBumperData(BumperData& bumper);
 
+    void resetMarkers();
+
+    void addMarker(const Point &point);
+
+    void sendMarkers();
+
     //bool readControlEffort(ControlEffort& ce);
 
     void sendBaseVelocity(double vx, double vy, double va);
@@ -47,6 +57,13 @@ public:
     void play(const std::string& file);
 
 private:
+
+    void init_marker_message();
+
+    visualization_msgs::MarkerArray _marker_array_msg;
+    visualization_msgs::Marker _empty_marker_msg;
+
+    ros::Publisher pub_marker_msg_;
 
     // Base velocity reference
 
