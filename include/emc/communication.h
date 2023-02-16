@@ -8,6 +8,7 @@
 #include <ros/publisher.h>
 #include <ros/subscriber.h>
 #include <ros/callback_queue.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
@@ -45,6 +46,9 @@ public:
     void speak(const std::string& text);
     
     void play(const std::string& file);
+
+    // Postion data
+    void sendPoseEstimate(geometry_msgs::Transform& pose);
 
 private:
 
@@ -107,8 +111,7 @@ private:
 
     void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
 */
-    // Postion data
-    void sendPositionEstimate(geometry_msgs::Transform& pose);
+    
 
 };
 

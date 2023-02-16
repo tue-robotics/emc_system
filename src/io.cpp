@@ -3,6 +3,7 @@
 #include "emc/communication.h"
 
 #include <ros/init.h>  // for ros::ok()
+#include <tf2/LinearMath/Quaternion.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Vector3.h>
@@ -90,7 +91,7 @@ bool IO::ok()
     return ros::ok();
 }
 
-void IO::sendPoseEstimate(double& px, double& py, double& pz, double& rx, double& ry, double& rz, double& rw)
+void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rx, const double& ry, const double& rz, const double& rw)
 {
     geometry_msgs::Transform pose;
     pose.translation.x = px;
@@ -101,19 +102,15 @@ void IO::sendPoseEstimate(double& px, double& py, double& pz, double& rx, double
     pose.rotation.z = rz;
     pose.rotation.w = rw;
 
+    comm_->sendPoseEstimate(pose);
+
 }
 
-void IO::sendPoseEstimate(double& px, double& py, double& pz, double& rr, double& rp, double& ry)
+void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rr, const double& rp, const double& ry)
 {
-    tf2::quaternion q;
+    tf2::Quaternion q;
     q.setRPY(rr, rp, ry);
-    this->sendPoseEstimate(px, py, pz, q.x(), q.y(), q.z(), q.w())
-}
-
-void IO::sendPoseEstimate(geo::Pose3D pose)
-{
-    double px, py, pz, rx, ry, rz, rw;
-
+    this->sendPoseEstimate(px, py, pz, double(q.x()), double(q.y()), double(q.z()), double(q.w()));
 }
 
 }

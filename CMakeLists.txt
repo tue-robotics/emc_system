@@ -5,7 +5,6 @@ add_compile_options(-Wall -Werror=all)
 add_compile_options(-Wextra -Werror=extra)
 
 find_package(catkin REQUIRED COMPONENTS
-    geolib2
     geometry_msgs
     sensor_msgs
     roscpp
