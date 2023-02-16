@@ -234,5 +234,15 @@ void Communication::controlEffortCallback(const emc_system::controlEffortConstPt
 }
 */
 
+void Communication::sendPoseEstimate(geometry_msgs::Transform& pose)
+{
+    geometry_msgs::TransformStamped transformStamped;
+    transformStamped.header.stamp = ros::Time::now();
+    transformStamped.header.frame_id = "map";
+    transformStamped.child_frame_id = "/base_link";
+    transformStamped.transform = pose;
+    pub_tf2.sendTransform(transformStamped);
+}
+
 } // end namespace emc
 

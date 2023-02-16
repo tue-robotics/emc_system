@@ -3,6 +3,9 @@
 #include "emc/communication.h"
 
 #include <ros/init.h>  // for ros::ok()
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/Vector3.h>
 
 #include <string>
 
@@ -85,6 +88,32 @@ void IO::play(const std::string& file)
 bool IO::ok()
 {
     return ros::ok();
+}
+
+void IO::sendPoseEstimate(double& px, double& py, double& pz, double& rx, double& ry, double& rz, double& rw)
+{
+    geometry_msgs::Transform pose;
+    pose.translation.x = px;
+    pose.translation.y = py;
+    pose.translation.z = pz;
+    pose.rotation.x = rx;
+    pose.rotation.y = ry;
+    pose.rotation.z = rz;
+    pose.rotation.w = rw;
+
+}
+
+void IO::sendPoseEstimate(double& px, double& py, double& pz, double& rr, double& rp, double& ry)
+{
+    tf2::quaternion q;
+    q.setRPY(rr, rp, ry);
+    this->sendPoseEstimate(px, py, pz, q.x(), q.y(), q.z(), q.w())
+}
+
+void IO::sendPoseEstimate(geo::Pose3D pose)
+{
+    double px, py, pz, rx, ry, rz, rw;
+
 }
 
 }

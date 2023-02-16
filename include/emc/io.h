@@ -8,6 +8,8 @@
 #include "emc/odom.h"
 #include "emc/bumper.h"
 
+#include <geolib/datatypes.h>
+
 namespace emc
 {
 
@@ -41,6 +43,13 @@ public:
     void speak(const std::string& text);
     
     void play(const std::string& file);
+
+    void sendPoseEstimate(double& px, double& py, double& pz, double& rx, double& ry, double& rz, double& rw); //use quaternion
+
+    void sendPoseEstimate(double& px, double& py, double& pz, double& rr, double& rp, double& ry); //use roll pitch yaw
+
+    void sendPoseEstimate(geo::pose3D& pose); //use pose
+
 
 private:
 

@@ -58,6 +58,8 @@ private:
     
     ros::Publisher pub_play_;
 
+    tf2_ros::TransformBroadcaster pub_tf2;
+
 
     // Laser data
 
@@ -105,6 +107,8 @@ private:
 
     void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
 */
+    // Postion data
+    void sendPositionEstimate(geometry_msgs::Transform& pose);
 
 };
 
