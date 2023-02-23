@@ -2,6 +2,8 @@
 
 #include <ros/node_handle.h>
 #include <ros/subscribe_options.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Matrix3x3.h>
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Empty.h>
@@ -50,18 +52,23 @@ Communication::Communication(std::string /*robot_name*/)
     ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
     sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
 
+    sub_mapdata = nh.subscribe<nav_msgs::MapMetaData>("/map_metadata",1, &Communication::mapCallback, this);
+
     pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
 
     pub_open_door_ = nh.advertise<std_msgs::Empty>(open_door_param, 1);
 
     pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
     pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
+
+    pub_tf2 = new tf2_ros::TransformBroadcaster;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
 Communication::~Communication()
 {
+    delete pub_tf2;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -199,14 +206,14 @@ void Communication::play(const std::string& file)
     pub_play_.publish(str);
 }
 
-void Communication::sendPoseEstimate(geometry_msgs::Transform& pose)
+void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
 {
     geometry_msgs::TransformStamped transformStamped;
     transformStamped.header.stamp = ros::Time::now();
     transformStamped.header.frame_id = "map";
     transformStamped.child_frame_id = "/base_link";
     transformStamped.transform = pose;
-    pub_tf2.sendTransform(transformStamped);
+    pub_tf2->sendTransform(transformStamped);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -235,6 +242,29 @@ void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
 void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 {
     bumper_b_msg_ = msg;
+}
+
+void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
+{
+    ROS_INFO_STREAM("Reading map");
+    mapconfig.mapResolution = msg->resolution;
+    mapconfig.mapOffsetX =  ((msg->height)*msg->resolution)/2;
+    mapconfig.mapOffsetY = -((msg->width)*msg->resolution)/2;
+
+    tf2::Quaternion q(msg->origin.orientation.x, 
+                      msg->origin.orientation.y, 
+                      msg->origin.orientation.z, 
+                      msg->origin.orientation.w);
+
+    tf2::Matrix3x3 T(q);
+
+    double roll, pitch, yaw;
+    T.getRPY(roll, pitch, yaw);
+
+    mapconfig.mapOrientation = yaw + M_PI/2;
+    mapconfig.mapInitialised = true;
+    ROS_INFO_STREAM("Map parameters:" << mapconfig.mapOffsetX << mapconfig.mapOffsetY << mapconfig.mapOrientation);
+    sub_mapdata.shutdown();
 }
 // ----------------------------------------------------------------------------------------------------
 /*

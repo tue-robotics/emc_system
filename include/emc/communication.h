@@ -9,6 +9,7 @@
 #include <ros/subscriber.h>
 #include <ros/callback_queue.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <nav_msgs/MapMetaData.h>
 
 #include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
@@ -18,6 +19,11 @@
 
 namespace emc
 {
+
+struct MapConfig{
+    double mapResolution, mapOffsetX, mapOffsetY, mapOrientation;
+    bool mapInitialised;
+};
 
 class Communication
 {
@@ -48,7 +54,10 @@ public:
     void play(const std::string& file);
 
     // Postion data
-    void sendPoseEstimate(geometry_msgs::Transform& pose);
+    void sendPoseEstimate(const geometry_msgs::Transform& pose);
+
+    // Map data
+    MapConfig mapconfig;
 
 private:
 
@@ -62,7 +71,7 @@ private:
     
     ros::Publisher pub_play_;
 
-    tf2_ros::TransformBroadcaster pub_tf2;
+    tf2_ros::TransformBroadcaster* pub_tf2; //has to be defined after ros::init(), which is called in the constructor
 
 
     // Laser data
@@ -99,6 +108,12 @@ private:
 
     void bumperfCallback(const std_msgs::BoolConstPtr& msg);
     void bumperbCallback(const std_msgs::BoolConstPtr& msg);
+
+    // Map data
+
+    ros::Subscriber sub_mapdata;
+
+    void mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg);
 
 /*
     // Control effort data

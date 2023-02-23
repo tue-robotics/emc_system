@@ -8,7 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     sensor_msgs
     roscpp
-    message_generation    
+    message_generation
+    tf2_ros    
 )
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)

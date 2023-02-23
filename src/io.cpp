@@ -3,7 +3,8 @@
 #include "emc/communication.h"
 
 #include <ros/init.h>  // for ros::ok()
-#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Vector3.h>
@@ -93,24 +94,33 @@ bool IO::ok()
 
 void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rx, const double& ry, const double& rz, const double& rw)
 {
-    geometry_msgs::Transform pose;
-    pose.translation.x = px;
-    pose.translation.y = py;
-    pose.translation.z = pz;
-    pose.rotation.x = rx;
-    pose.rotation.y = ry;
-    pose.rotation.z = rz;
-    pose.rotation.w = rw;
+    // apply map offset and send to comm_
+    tf2::Transform pose;
 
-    comm_->sendPoseEstimate(pose);
+    pose.setOrigin(tf2::Vector3(px, py, pz));
+    pose.setRotation(tf2::Quaternion(rx, ry, rz, rw));
+
+    if (comm_->mapconfig.mapInitialised)
+    {
+        tf2::Transform mapOffset;
+        mapOffset.setOrigin(tf2::Vector3(comm_->mapconfig.mapOffsetX, comm_->mapconfig.mapOffsetY, 0));
+        tf2::Quaternion q;
+        q.setRPY(0, 0, comm_->mapconfig.mapOrientation);
+        mapOffset.setRotation(q);
+
+        pose = pose * mapOffset;
+    }
+
+    comm_->sendPoseEstimate(tf2::toMsg(pose));
 
 }
 
-void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rr, const double& rp, const double& ry)
+void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& roll, const double& pitch, const double& yaw)
 {
+    //convert roll pitch yaw to quaternion
     tf2::Quaternion q;
-    q.setRPY(rr, rp, ry);
-    this->sendPoseEstimate(px, py, pz, double(q.x()), double(q.y()), double(q.z()), double(q.w()));
+    q.setRPY(roll, pitch, yaw);
+    this->sendPoseEstimate(px, py, pz, q.x(), q.y(), q.z(), q.w());
 }
 
 }
