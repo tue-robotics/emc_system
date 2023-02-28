@@ -9,6 +9,7 @@
 #include <ros/subscriber.h>
 #include <ros/callback_queue.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <sensor_msgs/JointState.h>
 #include <nav_msgs/MapMetaData.h>
 
 #include <std_msgs/Bool.h>
@@ -70,6 +71,10 @@ private:
     ros::Publisher pub_speak_;
     
     ros::Publisher pub_play_;
+
+    // Position data
+
+    ros::Publisher pub_joints;
 
     tf2_ros::TransformBroadcaster* pub_tf2; //has to be defined after ros::init(), which is called in the constructor
 
