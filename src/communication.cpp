@@ -246,7 +246,6 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 
 void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
 {
-    ROS_INFO_STREAM("Reading map");
     mapconfig.mapResolution = msg->resolution;
     mapconfig.mapOffsetX =  ((msg->height)*msg->resolution)/2;
     mapconfig.mapOffsetY = -((msg->width)*msg->resolution)/2;
@@ -263,7 +262,7 @@ void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
 
     mapconfig.mapOrientation = yaw + M_PI/2;
     mapconfig.mapInitialised = true;
-    ROS_INFO_STREAM("Map parameters:" << mapconfig.mapOffsetX << mapconfig.mapOffsetY << mapconfig.mapOrientation);
+    ROS_INFO_STREAM("Map data loaded");
     sub_mapdata.shutdown();
 }
 // ----------------------------------------------------------------------------------------------------

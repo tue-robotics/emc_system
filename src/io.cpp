@@ -99,7 +99,7 @@ void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, 
 
     pose.setOrigin(tf2::Vector3(px, py, pz));
     pose.setRotation(tf2::Quaternion(rx, ry, rz, rw));
-
+    if (!comm_->mapconfig.mapInitialised) {ros::spinOnce();} //check if map data can be read
     if (comm_->mapconfig.mapInitialised)
     {
         tf2::Transform mapOffset;
@@ -110,6 +110,8 @@ void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, 
 
         pose = pose * mapOffset;
     }
+
+    else{ROS_WARN_STREAM("No map data supplied");}
 
     comm_->sendPoseEstimate(tf2::toMsg(pose));
 
