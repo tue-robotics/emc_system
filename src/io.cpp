@@ -96,16 +96,16 @@ void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, 
 {
     // apply map offset and send to comm_
     tf2::Transform pose;
+    MapConfig mapData = comm_->getMapConfig();
 
     pose.setOrigin(tf2::Vector3(px, py, pz));
     pose.setRotation(tf2::Quaternion(rx, ry, rz, rw));
-    if (!comm_->mapconfig.mapInitialised) {ros::spinOnce();} //check if map data can be read
-    if (comm_->mapconfig.mapInitialised)
+    if (mapData.mapInitialised)
     {
         tf2::Transform mapOffset;
-        mapOffset.setOrigin(tf2::Vector3(comm_->mapconfig.mapOffsetX, comm_->mapconfig.mapOffsetY, 0));
+        mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
         tf2::Quaternion q;
-        q.setRPY(0, 0, comm_->mapconfig.mapOrientation);
+        q.setRPY(0, 0, mapData.mapOrientation);
         mapOffset.setRotation(q);
 
         pose = pose * mapOffset;

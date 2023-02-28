@@ -52,7 +52,8 @@ Communication::Communication(std::string /*robot_name*/)
     ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
     sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
 
-    sub_mapdata = nh.subscribe<nav_msgs::MapMetaData>("/map_metadata",1, &Communication::mapCallback, this);
+    ros::SubscribeOptions mapdata_sub_options = ros::SubscribeOptions::create<nav_msgs::MapMetaData>("/map_metadata", 1, boost::bind(&Communication::mapCallback, this, _1), ros::VoidPtr(), &mapdata_cb_queue_);
+    sub_mapdata_ = nh.subscribe(mapdata_sub_options);
 
     pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
 
@@ -216,6 +217,11 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
     pub_tf2->sendTransform(transformStamped);
 }
 
+MapConfig Communication::getMapConfig() {
+    if (!mapconfig.mapInitialised) {mapdata_cb_queue_.callAvailable();}//try to initialise the map
+    return mapconfig;
+}
+
 // ----------------------------------------------------------------------------------------------------
 
 void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
@@ -263,7 +269,7 @@ void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
     mapconfig.mapOrientation = yaw + M_PI/2;
     mapconfig.mapInitialised = true;
     ROS_INFO_STREAM("Map data loaded");
-    sub_mapdata.shutdown();
+    sub_mapdata_.shutdown();
 }
 // ----------------------------------------------------------------------------------------------------
 /*

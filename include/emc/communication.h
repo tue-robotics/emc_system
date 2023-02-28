@@ -57,7 +57,7 @@ public:
     void sendPoseEstimate(const geometry_msgs::Transform& pose);
 
     // Map data
-    MapConfig mapconfig;
+    MapConfig getMapConfig();
 
 private:
 
@@ -111,7 +111,11 @@ private:
 
     // Map data
 
-    ros::Subscriber sub_mapdata;
+    ros::CallbackQueue mapdata_cb_queue_;
+
+    ros::Subscriber sub_mapdata_;
+
+    MapConfig mapconfig;
 
     void mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg);
 
