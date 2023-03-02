@@ -74,8 +74,6 @@ private:
 
     // Position data
 
-    ros::Publisher pub_joints;
-
     tf2_ros::TransformBroadcaster* pub_tf2; //has to be defined after ros::init(), which is called in the constructor
 
 

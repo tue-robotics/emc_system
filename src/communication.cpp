@@ -62,7 +62,6 @@ Communication::Communication(std::string /*robot_name*/)
     pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
     pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
 
-    pub_joints = nh.advertise<sensor_msgs::JointState>("/viz_internal/joint_states", 1);
     pub_tf2 = new tf2_ros::TransformBroadcaster;
 }
 
@@ -210,16 +209,6 @@ void Communication::play(const std::string& file)
 
 void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
 {
-    // Publish jointstate
-    sensor_msgs::JointState jointState;
-    jointState.header.stamp = ros::Time::now();
-    jointState.name = {"front_left_wheel_hinge", 
-                       "front_right_wheel_hinge", 
-                       "rear_left_wheel_hinge", 
-                       "rear_right_wheel_hinge"};
-    jointState.position = {0, 0, 0, 0};
-    pub_joints.publish(jointState);
-
     // Publish tf transform
     geometry_msgs::TransformStamped transformStamped;
     transformStamped.header.stamp = ros::Time::now();
