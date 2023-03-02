@@ -96,11 +96,11 @@ void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, 
 {
     // apply map offset and send to comm_
     tf2::Transform pose;
-    MapConfig mapData = comm_->getMapConfig();
-
+    MapConfig mapData;
     pose.setOrigin(tf2::Vector3(px, py, pz));
     pose.setRotation(tf2::Quaternion(rx, ry, rz, rw));
-    if (mapData.mapInitialised)
+
+    if (comm_->getMapConfig(mapData))
     {
         tf2::Transform mapOffset;
         mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));

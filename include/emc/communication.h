@@ -58,7 +58,7 @@ public:
     void sendPoseEstimate(const geometry_msgs::Transform& pose);
 
     // Map data
-    MapConfig getMapConfig();
+    bool getMapConfig(MapConfig& config);
 
 private:
 

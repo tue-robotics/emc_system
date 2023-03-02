@@ -229,9 +229,10 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
     pub_tf2->sendTransform(transformStamped);
 }
 
-MapConfig Communication::getMapConfig() {
+bool Communication::getMapConfig(MapConfig& config) {
     if (!mapconfig.mapInitialised) {mapdata_cb_queue_.callAvailable();}//try to initialise the map
-    return mapconfig;
+    config = mapconfig;
+    return mapconfig.mapInitialised;
 }
 
 // ----------------------------------------------------------------------------------------------------
