@@ -7,8 +7,10 @@ add_compile_options(-Wextra -Werror=extra)
 find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     sensor_msgs
+    nav_msgs
     roscpp
     message_generation
+    tf2
     tf2_ros    
 )
 

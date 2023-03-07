@@ -62,14 +62,14 @@ Communication::Communication(std::string /*robot_name*/)
     pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
     pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
 
-    pub_tf2 = new tf2_ros::TransformBroadcaster;
+    pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
 }
 
 // ----------------------------------------------------------------------------------------------------
 
 Communication::~Communication()
 {
-    delete pub_tf2;
+    
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -219,7 +219,8 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
 }
 
 bool Communication::getMapConfig(MapConfig& config) {
-    if (!mapconfig.mapInitialised) {mapdata_cb_queue_.callAvailable();}//try to initialise the map
+    if (!mapconfig.mapInitialised)
+        mapdata_cb_queue_.callAvailable(); //try to initialise the map
     config = mapconfig;
     return mapconfig.mapInitialised;
 }
@@ -255,8 +256,8 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
 {
     mapconfig.mapResolution = msg->resolution;
-    mapconfig.mapOffsetX =  ((msg->height)*msg->resolution)/2;
-    mapconfig.mapOffsetY = -((msg->width)*msg->resolution)/2;
+    mapconfig.mapOffsetX = ((msg->height) * msg->resolution)/2;
+    mapconfig.mapOffsetY = -((msg->width) * msg->resolution)/2;
 
     tf2::Quaternion q(msg->origin.orientation.x, 
                       msg->origin.orientation.y, 

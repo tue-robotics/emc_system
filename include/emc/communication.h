@@ -17,6 +17,7 @@
 #include <nav_msgs/Odometry.h>
 #include <emc_system/controlEffort.h>
 #include <string>
+#include <memory>
 
 namespace emc
 {
@@ -74,7 +75,7 @@ private:
 
     // Position data
 
-    tf2_ros::TransformBroadcaster* pub_tf2; //has to be defined after ros::init(), which is called in the constructor
+    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2; //has to be defined after ros::init(), which is called in the constructor
 
 
     // Laser data

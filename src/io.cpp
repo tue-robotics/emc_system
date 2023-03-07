@@ -92,7 +92,7 @@ bool IO::ok()
     return ros::ok();
 }
 
-void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rx, const double& ry, const double& rz, const double& rw)
+void IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw)
 {
     // apply map offset and send to comm_
     tf2::Transform pose;
@@ -110,14 +110,16 @@ void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, 
 
         pose = pose * mapOffset;
     }
-
-    else{ROS_WARN_STREAM("No map data supplied");}
+    else
+    {
+        ROS_WARN_STREAM("No map data supplied");
+    }
 
     comm_->sendPoseEstimate(tf2::toMsg(pose));
 
 }
 
-void IO::sendPoseEstimate(const double& px, const double& py, const double& pz, const double& roll, const double& pitch, const double& yaw)
+void IO::sendPoseEstimate(double px, double py, double pz, double roll, double pitch, double yaw)
 {
     //convert roll pitch yaw to quaternion
     tf2::Quaternion q;

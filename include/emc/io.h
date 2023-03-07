@@ -42,9 +42,9 @@ public:
     
     void play(const std::string& file);
 
-    void sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rx, const double& ry, const double& rz, const double& rw); //use quaternion
+    void sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw); //use quaternion
 
-    void sendPoseEstimate(const double& px, const double& py, const double& pz, const double& rr, const double& rp, const double& ry); //use roll pitch yaw
+    void sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
 
 private:
 
