@@ -42,6 +42,8 @@ public:
     
     void play(const std::string& file);
 
+    bool sendPath(std::vector<std::vector<double>> path, std::vector<double> color, int id);
+
     void sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw); //use quaternion
 
     void sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw

@@ -14,6 +14,7 @@
 
 #include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
+#include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
 #include <emc_system/controlEffort.h>
 #include <string>
@@ -51,6 +52,8 @@ public:
 
     void sendOpendoorRequest();
 
+    void sendMarker(visualization_msgs::Marker marker);
+
     void speak(const std::string& text);
     
     void play(const std::string& file);
@@ -73,6 +76,7 @@ private:
     
     ros::Publisher pub_play_;
 
+    ros::Publisher pub_marker_;
     // Position data
 
     std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2; //has to be defined after ros::init(), which is called in the constructor

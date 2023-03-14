@@ -62,6 +62,8 @@ Communication::Communication(std::string /*robot_name*/)
     pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
     pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
 
+    pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
+
     pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
 }
 
@@ -189,6 +191,13 @@ void Communication::sendOpendoorRequest()
 {
     std_msgs::Empty msg;
     pub_open_door_.publish(msg);
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void Communication::sendMarker(visualization_msgs::Marker marker)
+{
+    pub_marker_.publish(marker);
 }
 
 // ----------------------------------------------------------------------------------------------------

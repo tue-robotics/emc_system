@@ -8,6 +8,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Vector3.h>
+#include <visualization_msgs/Marker.h>
 
 #include <string>
 
@@ -90,6 +91,79 @@ void IO::play(const std::string& file)
 bool IO::ok()
 {
     return ros::ok();
+}
+
+bool IO::sendPath(std::vector<std::vector<double>> path, std::vector<double> color = {0.0, 0.0, 0.0}, int id = 0)
+{
+    if (color.size() < 3)
+    {
+        color = {0.0, 0.0, 0.0};
+        ROS_WARN_STREAM("invalid color");
+    }
+    MapConfig mapData;
+    comm_->getMapConfig(mapData);
+    visualization_msgs::Marker pathMarker;
+    pathMarker.header.frame_id = "map";
+    pathMarker.header.stamp = ros::Time();
+    pathMarker.ns = "path";
+    pathMarker.id = id;
+    pathMarker.type = visualization_msgs::Marker::LINE_STRIP;
+    pathMarker.action = visualization_msgs::Marker::ADD;
+    pathMarker.color.a = 1.0;
+    pathMarker.color.r = color[0];
+    pathMarker.color.g = color[1];
+    pathMarker.color.b = color[2];
+    pathMarker.pose.orientation.w = 1.0;
+    pathMarker.scale.x = 0.01;
+    for (std::vector<std::vector<double>>::iterator it = path.begin(); it != path.end(); ++it)
+    {
+        geometry_msgs::Point point;
+        if ((*it).size() < 2)
+        {
+            ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " is invalid, skipping");;
+            continue;
+        }
+        point.x = (*it)[0];
+        point.y = (*it)[1];
+        if ((*it).size() == 2)
+        {
+            point.z = 0;
+        }
+        else
+        {
+            point.z = (*it)[3];
+            if ((*it).size() > 3)
+            {
+                ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions");
+            }
+        }
+
+        if (mapData.mapInitialised)
+        {
+            tf2::Transform tfPoint;
+            tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
+            tfPoint.setRotation(tf2::Quaternion(0, 0, 0, 1));
+            tf2::Transform mapOffset;
+            mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
+            tf2::Quaternion q;
+            q.setRPY(0, 0, mapData.mapOrientation);
+            mapOffset.setRotation(q);
+
+            tfPoint = mapOffset * tfPoint;
+            point.x = tfPoint.getOrigin().x();
+            point.y = tfPoint.getOrigin().y();
+            point.z = tfPoint.getOrigin().z();
+        }
+
+        pathMarker.points.push_back(point);
+    }
+    if (pathMarker.points.size() < 2)
+    {
+        ROS_ERROR_STREAM("not enough valid points");
+        return false;
+    }
+    comm_->sendMarker(pathMarker);
+    return true;
 }
 
 void IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw)
