@@ -255,21 +255,22 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 
 void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
 {
-    mapconfig.mapResolution = msg->resolution;
-    mapconfig.mapOffsetX = ((msg->height) * msg->resolution)/2;
-    mapconfig.mapOffsetY = -((msg->width) * msg->resolution)/2;
-
-    tf2::Quaternion q(msg->origin.orientation.x, 
-                      msg->origin.orientation.y, 
-                      msg->origin.orientation.z, 
+    tf2::Quaternion q(msg->origin.orientation.x,
+                      msg->origin.orientation.y,
+                      msg->origin.orientation.z,
                       msg->origin.orientation.w);
-
+    
     tf2::Matrix3x3 T(q);
 
     double roll, pitch, yaw;
     T.getRPY(roll, pitch, yaw);
 
     mapconfig.mapOrientation = yaw + M_PI/2;
+
+    mapconfig.mapResolution = msg->resolution;
+
+    mapconfig.mapOffsetX = (msg->width * mapconfig.mapResolution / 2) * cos(yaw)-(msg->height * mapconfig.mapResolution / 2) * sin(yaw) + msg->origin.position.x;
+    mapconfig.mapOffsetY = (msg->width * mapconfig.mapResolution / 2) * sin(yaw)+(msg->height * mapconfig.mapResolution / 2) * cos(yaw) + msg->origin.position.y;
     mapconfig.mapInitialised = true;
     ROS_INFO_STREAM("Map data loaded");
     sub_mapdata_.shutdown();
