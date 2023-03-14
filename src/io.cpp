@@ -108,7 +108,7 @@ void IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry,
         q.setRPY(0, 0, mapData.mapOrientation);
         mapOffset.setRotation(q);
 
-        pose = pose * mapOffset;
+        pose = mapOffset * pose;
     }
     else
     {
