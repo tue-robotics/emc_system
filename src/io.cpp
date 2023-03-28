@@ -93,7 +93,7 @@ bool IO::ok()
     return ros::ok();
 }
 
-bool IO::sendPath(std::vector<std::vector<double>> path, std::vector<double> color = {0.0, 0.0, 0.0}, int id = 0)
+bool IO::sendPath(std::vector<std::vector<double>> path, std::vector<double> color, int id)
 {
     if (color.size() < 3)
     {

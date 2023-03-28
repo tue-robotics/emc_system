@@ -42,7 +42,7 @@ public:
     
     void play(const std::string& file);
 
-    bool sendPath(std::vector<std::vector<double>> path, std::vector<double> color, int id);
+    bool sendPath(std::vector<std::vector<double>> path, std::vector<double> color = {0.0, 0.0, 0.0}, int id = 0);
 
     void sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw); //use quaternion
 
