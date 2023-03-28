@@ -1,11 +1,11 @@
 #ifndef EMC_SYSTEM_SYSTEM_H_
 #define EMC_SYSTEM_SYSTEM_H_
 
-#include "emc/data.h"
-#include "emc/io.h"
-
 #include <map>
+#include <vector>
 #include <iostream>
+#include <ros/init.h>
+#include <ros/rate.h>
 
 namespace emc
 {
@@ -14,18 +14,48 @@ namespace emc
 static const char* no_event = 0;
 #pragma GCC diagnostic push
 
-typedef void (*state_function)(FSMInterface&, IO& io, void* user_data);
-
 class Communication;
 
-class Engine
+class FSMInterface
 {
 
 public:
 
-    Engine();
+    void raiseEvent(const char* event)
+    {
+        event_ = event;
+    }
 
-    ~Engine();
+    bool running() const;
+
+    const std::string& event() const { return event_; }
+
+private:
+
+    std::string event_;
+
+};
+
+template <class T>
+using state_function = void (*)(FSMInterface&, T&);
+
+template <class T>
+class FSM
+{
+
+public:
+
+    FSM()
+    {
+        // Register the special 'null' event
+        events.push_back("NO_EVENT");
+        event_to_int[""] = 0;
+    }
+
+    ~FSM()
+    {
+
+    }
 
     void setInitialState(const char* state)
     {
@@ -34,7 +64,7 @@ public:
             addError("While setting initial state: Unknown state: '" + std::string(state) + "'");
     }
 
-    void registerState(const char* state, state_function func)
+    void registerState(const char* state, state_function<T> func)
     {
         int s_id = addState(state);
         if (s_id < 0)
@@ -68,15 +98,63 @@ public:
         s1_data.transitions[e] = s2;
     }
 
-    void run();
+    void run()
+    {
+        if (has_error_)
+            return;
+
+        if (state_ < 0)
+        {
+            addError("Initial state not specified");
+            return;
+        }
+
+        if (loop_freq_ <= 0)
+        {
+            addError("Loop frequency not set.");
+            return;
+        }
+
+        ros::Rate r(loop_freq_);
+        while(ros::ok())
+        {
+            FSMInterface fsm;
+
+            StateDetail& s = state_details[state_];
+            s.func(fsm, (*user_data_));
+
+            if (!ros::ok())
+                break;
+
+            int event_id = getEvent(fsm.event().c_str());
+            if (event_id < 0)
+            {
+                addError("Unknown event '" + fsm.event() + "' raised in state '" + stateToString(state_) + "'");
+                break;
+            }
+
+            if (event_id > 0)
+            {
+                std::map<int, int> ::const_iterator it = s.transitions.find(event_id);
+                if (it == s.transitions.end())
+                {
+                    addError("Cannot deal with event '" + eventToString(event_id) + "'' in state '" + stateToString(state_) + "'");
+                    break;
+                }
+
+                state_ = it->second;
+            }
+
+            r.sleep();
+        }
+    }
+
 
     void setLoopFrequency(double freq) { loop_freq_ = freq; }
 
-    void setUserData(void* user_data) { user_data_ = user_data; }
+    void setUserData(T& user_data) { user_data_ = &user_data; }
 
 private:
-
-    IO* io_;
 
     int state_;
 
@@ -86,7 +164,7 @@ private:
 
         std::string name;
         std::map<int, int> transitions;
-        state_function func;
+        state_function<T> func;
     };
 
     std::map<std::string, int> event_to_int;
@@ -97,7 +175,7 @@ private:
 
     std::vector<StateDetail> state_details;
 
-    void* user_data_;
+    T* user_data_;
 
     double loop_freq_;
 
@@ -161,7 +239,7 @@ private:
         return events[event_id];
     }
 
-    bool has_error_;
+    bool has_error_ = false;
 
     void addError(const std::string& err)
     {

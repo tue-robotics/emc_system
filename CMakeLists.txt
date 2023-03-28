@@ -65,7 +65,7 @@ include_directories(
 )
 
 add_library(emc_system
-    include/emc/engine.h
+    include/emc/fsm.h
     include/emc/communication.h
     include/emc/data.h
     include/emc/odom.h
@@ -73,7 +73,7 @@ add_library(emc_system
     include/emc/rate.h
     include/emc/bumper.h
 
-    src/engine.cpp
+    src/fsm.cpp
     src/communication.cpp
     src/data.cpp
     src/io.cpp

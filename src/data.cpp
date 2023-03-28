@@ -5,9 +5,5 @@
 namespace emc
 {
 
-bool FSMInterface::running() const
-{
-    return ros::ok();
-}
 
 }

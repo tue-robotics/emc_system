@@ -32,25 +32,6 @@ struct ControlEffort
 
 // ----------------------------------------------------------------------------------------------------
 
-class FSMInterface
-{
-
-public:
-
-    void raiseEvent(const char* event)
-    {
-        event_ = event;
-    }
-
-    bool running() const;
-
-    const std::string& event() const { return event_; }
-
-private:
-
-    std::string event_;
-
-};
 
 } // end namespace emc
 

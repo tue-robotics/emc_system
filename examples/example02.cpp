@@ -1,4 +1,5 @@
-#include <emc/engine.h>
+#include <emc/fsm.h>
+#include <emc/io.h>
 
 #include <iostream>
 
@@ -9,6 +10,7 @@
 struct MyData
 {
     double max_obstacle_distance;
+    emc::IO io;
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -27,7 +29,7 @@ double calculateMinimumDistance(const emc::LaserData& scan)
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_initialize(emc::FSMInterface& fsm, emc::IO& /*io*/, void* /*user_data*/)
+void state_initialize(emc::FSMInterface& fsm, MyData& /*user_data*/)
 {
     std::cout << "initializing..." << std::endl;
 
@@ -40,28 +42,27 @@ void state_initialize(emc::FSMInterface& fsm, emc::IO& /*io*/, void* /*user_data
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_driving(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
+void state_driving(emc::FSMInterface& fsm, MyData& my_data)
 {
     // The FSM engine does not know what kind of user data will be put into it, so it stores it as a
     // 'void pointer'. A void pointer is simply a pointer to data of which the type is unknown. But
     // we DO know the type! Therefore we can 'cast' it to our MyData type that we defined above. You
     // don't have to exactly know what is going on here, just know that the resulting 'my_data' is a
     // pointer to our data, with the correct type.
-    MyData* my_data = static_cast<MyData*>(user_data);
 
     emc::LaserData scan;
-    if (!io.readLaserData(scan))
+    if (!my_data.io.readLaserData(scan))
         return; // No data, so not much to do
 
     double min_dist = calculateMinimumDistance(scan);
-    if (min_dist < my_data->max_obstacle_distance)    // magic number!
+    if (min_dist < my_data.max_obstacle_distance)    // magic number!
     {
         fsm.raiseEvent("obstacle_near");
         return;
     }
 
     // No obstacles near, so let's go!
-    io.sendBaseReference(0.3, 0, 0);
+    my_data.io.sendBaseReference(0.3, 0, 0);
 
     // We're driving...!
     std::cout << "driving" << std::endl;
@@ -69,23 +70,21 @@ void state_driving(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
 
 // ----------------------------------------------------------------------------------------------------
 
-void state_waiting(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
+void state_waiting(emc::FSMInterface& fsm, MyData& my_data)
 {
-    // Cast the data to our MyData type! (See explanation in state_driving)
-    MyData* my_data = static_cast<MyData*>(user_data);
 
     // Stop the base!
-    io.sendBaseReference(0, 0, 0);
+    my_data.io.sendBaseReference(0, 0, 0);
 
     // We're waiting..!
     std::cout << "waiting" << std::endl;
 
     emc::LaserData scan;
-    if (!io.readLaserData(scan))
+    if (!my_data.io.readLaserData(scan))
         return; // No data, so not much to do
 
     double min_dist = calculateMinimumDistance(scan);
-    if (min_dist > my_data->max_obstacle_distance)
+    if (min_dist > my_data.max_obstacle_distance)
     {
         // All clear!
         fsm.raiseEvent("all_clear");
@@ -98,12 +97,12 @@ void state_waiting(emc::FSMInterface& fsm, emc::IO& io, void* user_data)
 int main()
 {
     // Initialize the state machine engine
-    emc::Engine engine;
+    emc::FSM<MyData> engine;
 
     // Initialize the data that we will use. This data will be available in all state functions
     MyData data;
     data.max_obstacle_distance = 0.2; // Just a magic number ...
-    engine.setUserData(&data);
+    engine.setUserData(data);
 
     // Set the loop frequency of the engine. This means or state functions will be called at this frequency
     engine.setLoopFrequency(10);
