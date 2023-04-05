@@ -14,14 +14,12 @@ msg = """
 Reading from the keyboard  and Publishing to Twist!
 ---------------------------
 Moving around:
-   7    8    9
-   4    5    6
-   1    2    3
+   u    i    o
+   j    k    l
+   m    ,    .
 
-/   : rotate counterclockwise
-*   : rotate clockwise
-
-f/v : increase/decrease altitude
+9   : rotate counterclockwise
+0   : rotate clockwise
 
 q/z : increase/decrease max speeds by 10%
 w/x : increase/decrease only linear speed by 10%
@@ -32,16 +30,16 @@ CTRL-C to quit
 """
 
 moveBindings = {
-        '1':(-0.7,0.7,0),
-        '2':(-1,0,0),
-        '3':(-0.7,-0.7,0),
-        '4':(0,1,0),
-        '6':(0,-1,0),
-        '7':(0.7,0.7,0),
-        '8':(1,0,0),
-        '9':(0.7,-0.7,0),
-        '/':(0,0,1),
-        '*':(0,0,-1)
+        'm':(-0.7,0.7,0),
+        ',':(-1,0,0),
+        '.':(-0.7,-0.7,0),
+        'j':(0,1,0),
+        'l':(0,-1,0),
+        'u':(0.7,0.7,0),
+        'i':(1,0,0),
+        'o':(0.7,-0.7,0),
+        '9':(0,0,1),
+        '0':(0,0,-1)
            }
 
 speedBindings={
@@ -57,7 +55,10 @@ speedBindings={
 class PublishThread(threading.Thread):
     def __init__(self, rate, robot_name):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        if not rospy.has_param('base_ref_'):
+            raise Exception("Could not find base_ref_ on parameter server")
+        cmd_vel_topic = rospy.get_param('base_ref_')
+        self.publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=1)
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
