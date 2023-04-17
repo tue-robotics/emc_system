@@ -93,13 +93,8 @@ bool IO::ok()
     return ros::ok();
 }
 
-bool IO::sendPath(std::vector<std::vector<double>> path, std::vector<double> color, int id)
+bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
 {
-    if (color.size() < 3)
-    {
-        color = {0.0, 0.0, 0.0};
-        ROS_WARN_STREAM("invalid color");
-    }
     MapConfig mapData;
     comm_->getMapConfig(mapData);
     visualization_msgs::Marker pathMarker;
@@ -114,7 +109,7 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::vector<double> col
     pathMarker.color.g = color[1];
     pathMarker.color.b = color[2];
     pathMarker.pose.orientation.w = 1.0;
-    pathMarker.scale.x = 0.01;
+    pathMarker.scale.x = width;
     for (std::vector<std::vector<double>>::iterator it = path.begin(); it != path.end(); ++it)
     {
         geometry_msgs::Point point;
