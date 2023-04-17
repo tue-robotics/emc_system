@@ -24,5 +24,11 @@
 
   <build_export_depend>message_runtime</build_export_depend>
   <exec_depend>message_runtime</exec_depend>
+  
+  <doc_depend>doxygen</doc_depend>
+
+  <export>
+    <rosdoc config="rosdoc.yaml" />
+  </export>
 
 </package>
