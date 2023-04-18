@@ -100,15 +100,27 @@ public:
     /**
      * @brief Send a path to be drawn in rviz.
      * 
-     * @param path The sequence of points, between which the path will be drawn.
-     * @param color The color in which the path will be drawn.
-     * @param width The line width.
+     * @param path The sequence of points, between which the path will be drawn. The sequence must be provided as a vector of points, where each point is formatted as {x,y,z} or {x,y}. Coordinates are relative to the centre of the map (same as simulator coordinates).
+     * @param color The color in which the path will be drawn. Format is {r,g,b}, with each value between 0.0 and 1.0.
+     * @param width [m] Line width.
      * @param id The id of this path. When drawing multiple paths, each sequence must have a unique id. Sending a new path with the same id will overwrite the previous path.
      * 
      * @return true Path is sent to rviz.
      * @return false Path does not have enough valid points.
      */
     bool sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color = {0.0, 0.0, 0.0}, double width = 0.02, int id = 0);
+
+
+    /**
+     * @brief Send an estimate of the current robot pose to be shown in rviz, relative to the centre of the map (same as simulator coordinates).
+     * 
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @param yaw The yaw rotation
+    */
+    bool sendPoseEstimate(double x, double y, double yaw);
+
+private:
 
     /**
      * @brief Send an estimate of the current robot pose to be shown in rviz. Rotation is provided as a quaternion.
@@ -121,7 +133,7 @@ public:
      * @param rz The z component of the rotation.
      * @param rw The w component of the rotation.
      */
-    void sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw); //use quaternion
+    bool sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw); //use quaternion
 
     /**
      * @brief Send an estimate of the current robot pose to be shown in rviz. Rotation is provided as roll pitch and yaw.
@@ -133,9 +145,7 @@ public:
      * @param rp The pitch component of the rotation.
      * @param ry The yaw component of the rotation.
      */
-    void sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
-
-private:
+    bool sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
 
     Communication* comm_;
 

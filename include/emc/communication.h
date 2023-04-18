@@ -24,7 +24,30 @@ namespace emc
 {
 
 struct MapConfig{
-    double mapResolution, mapOffsetX, mapOffsetY, mapOrientation;
+
+    /**
+     * @brief The width of each pixel in the map.
+    */
+    double mapResolution;
+
+    /**
+     * @brief The X coordinate of the centre of the map.
+    */
+    double mapOffsetX;
+
+    /**
+     * @brief The Y coordinate of the centre of the map.
+    */
+    double mapOffsetY;
+
+    /**
+     * @brief The rotation of the map.
+    */
+    double mapOrientation;
+
+    /**
+     * @brief Indicates if the map is initialised. if this is false, do not use the data.
+    */
     bool mapInitialised;
 };
 

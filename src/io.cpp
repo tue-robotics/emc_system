@@ -96,7 +96,11 @@ bool IO::ok()
 bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
 {
     MapConfig mapData;
-    comm_->getMapConfig(mapData);
+    if (!comm_->getMapConfig(mapData))
+    {
+        ROS_ERROR_STREAM("No map data supplied");
+        return false;
+    }
     visualization_msgs::Marker pathMarker;
     pathMarker.header.frame_id = "map";
     pathMarker.header.stamp = ros::Time();
@@ -115,7 +119,7 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
         geometry_msgs::Point point;
         if ((*it).size() < 2)
         {
-            ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " is invalid, skipping");;
+            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
             continue;
         }
         point.x = (*it)[0];
@@ -129,39 +133,36 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
             point.z = (*it)[3];
             if ((*it).size() > 3)
             {
-                ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions");
+                ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
             }
         }
 
-        if (mapData.mapInitialised)
-        {
-            tf2::Transform tfPoint;
-            tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
-            tfPoint.setRotation(tf2::Quaternion(0, 0, 0, 1));
-            tf2::Transform mapOffset;
-            mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
-            tf2::Quaternion q;
-            q.setRPY(0, 0, mapData.mapOrientation);
-            mapOffset.setRotation(q);
+        tf2::Transform tfPoint;
+        tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
+        tfPoint.setRotation(tf2::Quaternion(0, 0, 0, 1));
+        tf2::Transform mapOffset;
+        mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
+        tf2::Quaternion q;
+        q.setRPY(0, 0, mapData.mapOrientation);
+        mapOffset.setRotation(q);
 
-            tfPoint = mapOffset * tfPoint;
-            point.x = tfPoint.getOrigin().x();
-            point.y = tfPoint.getOrigin().y();
-            point.z = tfPoint.getOrigin().z();
-        }
-
+        tfPoint = mapOffset * tfPoint;
+        point.x = tfPoint.getOrigin().x();
+        point.y = tfPoint.getOrigin().y();
+        point.z = tfPoint.getOrigin().z();
+        
         pathMarker.points.push_back(point);
     }
     if (pathMarker.points.size() < 2)
     {
-        ROS_ERROR_STREAM("not enough valid points");
+        ROS_ERROR_STREAM("Not enough valid points (expected at least 2, got " << pathMarker.points.size() << ").");
         return false;
     }
     comm_->sendMarker(pathMarker);
     return true;
 }
 
-void IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw)
+bool IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw)
 {
     // apply map offset and send to comm_
     tf2::Transform pose;
@@ -181,19 +182,25 @@ void IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry,
     }
     else
     {
-        ROS_WARN_STREAM("No map data supplied");
+        ROS_ERROR_STREAM("No map data supplied");
+        return false;
     }
 
     comm_->sendPoseEstimate(tf2::toMsg(pose));
-
+    return true;
 }
 
-void IO::sendPoseEstimate(double px, double py, double pz, double roll, double pitch, double yaw)
+bool IO::sendPoseEstimate(double px, double py, double pz, double roll, double pitch, double yaw)
 {
     //convert roll pitch yaw to quaternion
     tf2::Quaternion q;
     q.setRPY(roll, pitch, yaw);
-    this->sendPoseEstimate(px, py, pz, q.x(), q.y(), q.z(), q.w());
+    return this->sendPoseEstimate(px, py, pz, q.x(), q.y(), q.z(), q.w());
+}
+
+bool IO::sendPoseEstimate(double x, double y, double yaw)
+{
+    return this->sendPoseEstimate(x, y, 0, 0, 0, yaw);
 }
 
 }
