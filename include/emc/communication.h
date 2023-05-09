@@ -16,7 +16,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
-#include <emc_system/controlEffort.h>
 #include <string>
 #include <memory>
 

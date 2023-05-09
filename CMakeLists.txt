@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     nav_msgs
     roscpp
-    message_generation
     tf2
     tf2_ros    
 )
@@ -21,14 +20,6 @@ find_package(OpenCV REQUIRED)
 # ------------------------------------------------------------------------------------------------
 #                                     ROS MESSAGES AND SERVICES
 # ------------------------------------------------------------------------------------------------
-
-# Generate messages
-add_message_files(
-   FILES
-   motorCurrent.msg
-   controlEffort.msg
-#    ...
- )
 
 # Generate services
 # add_service_files(
