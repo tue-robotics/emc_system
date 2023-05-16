@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /odom_frame1/Status1
       Splitter Ratio: 0.5
     Tree Height: 719
   - Class: rviz/Selection
@@ -85,7 +86,7 @@ Visualization Manager:
       Length: 0.30000001192092896
       Name: laser_frame
       Radius: 0.05000000074505806
-      Reference Frame: laser
+      Reference Frame: transformed_laser
       Show Trail: false
       Value: true
     - Alpha: 1
@@ -101,7 +102,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: laser
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -134,7 +135,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 111.27886199951172
+      Scale: 140.45877075195312
       Target Frame: laser
       X: 1
       Y: 0
