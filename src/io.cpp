@@ -162,6 +162,62 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
     return true;
 }
 
+bool IO::sendPoints(std::vector<std::array<double, 2>> points, std::array<double, 3> color, double width, int id)
+{
+    MapConfig mapData;
+    if (!comm_->getMapConfig(mapData))
+    {
+        ROS_ERROR_STREAM("No map data supplied");
+        return false;
+    }
+    if (points.size() < 1)
+    {
+        ROS_ERROR_STREAM("No points supplied");
+        return false;
+    }
+    visualization_msgs::Marker PointMarker;
+    PointMarker.header.frame_id = "map";
+    PointMarker.header.stamp = ros::Time();
+    PointMarker.ns = "points";
+    PointMarker.id = id;
+    PointMarker.type = visualization_msgs::Marker::SPHERE_LIST;
+    PointMarker.action = visualization_msgs::Marker::ADD;
+    PointMarker.color.a = 1.0;
+    PointMarker.color.r = color[0];
+    PointMarker.color.g = color[1];
+    PointMarker.color.b = color[2];
+    PointMarker.pose.orientation.w = 1.0;
+    PointMarker.scale.x = width;
+    PointMarker.scale.y = width;
+    PointMarker.scale.z = width;
+    for (std::vector<std::array<double, 2>>::iterator it = points.begin(); it != points.end(); ++it)
+    {
+        geometry_msgs::Point point;
+        
+        point.x = (*it)[0];
+        point.y = (*it)[1];
+        point.z = 0;
+
+        tf2::Transform tfPoint;
+        tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
+        tfPoint.setRotation(tf2::Quaternion(0, 0, 0, 1));
+        tf2::Transform mapOffset;
+        mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
+        tf2::Quaternion q;
+        q.setRPY(0, 0, mapData.mapOrientation);
+        mapOffset.setRotation(q);
+
+        tfPoint = mapOffset * tfPoint;
+        point.x = tfPoint.getOrigin().x();
+        point.y = tfPoint.getOrigin().y();
+        point.z = tfPoint.getOrigin().z();
+        
+        PointMarker.points.push_back(point);
+    }
+    comm_->sendMarker(PointMarker);
+    return true;
+}
+
 bool IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry, double rz, double rw)
 {
     // apply map offset and send to comm_

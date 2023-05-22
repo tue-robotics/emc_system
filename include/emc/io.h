@@ -106,10 +106,22 @@ public:
      * @param id The id of this path. When drawing multiple paths, each sequence must have a unique id. Sending a new path with the same id will overwrite the previous path.
      * 
      * @return true Path is sent to rviz.
-     * @return false Path does not have enough valid points.
+     * @return false Path does not have enough valid points, or the map is not loaded yet.
      */
     bool sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color = {0.0, 0.0, 0.0}, double width = 0.02, int id = 0);
 
+    /**
+     * @brief Send a set of points to be drawn in rviz.
+     * 
+     * @param points The set of points that will be drawn. The set must be provided as a vector of points, where each point is formatted as {x,y}. Coordinates are relative to the centre of the map (same as simulator coordinates).
+     * @param color The color in which the points will be drawn. Format is {r,g,b}, with each value between 0.0 and 1.0.
+     * @param width [m] Point diameter.
+     * @param id The id of this set of points. When drawing multiple sets of points, each set must have a unique id. Sending a new set of points with the same id will overwrite the previous set.
+     * 
+     * @return true The points are sent to rviz.
+     * @return false The set does not contain any points, or the map is not loaded yet.
+     */
+    bool sendPoints(std::vector<std::array<double, 2>> points, std::array<double, 3> color = {0.0, 0.0, 0.0}, double width = 0.05, int id = 0);
 
     /**
      * @brief Send an estimate of the current robot pose to be shown in rviz, relative to the centre of the map (same as simulator coordinates).
