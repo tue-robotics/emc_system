@@ -119,22 +119,15 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
         geometry_msgs::Point point;
         if ((*it).size() < 2)
         {
-            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
+            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected 2, got " << (*it).size() << "), skipping.");
             continue;
         }
         point.x = (*it)[0];
         point.y = (*it)[1];
-        if ((*it).size() == 2)
+        point.z = 0;
+        if ((*it).size() > 2)
         {
-            point.z = 0;
-        }
-        else
-        {
-            point.z = (*it)[3];
-            if ((*it).size() > 3)
-            {
-                ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
-            }
+            ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2, got " << (*it).size() << ").");
         }
 
         tf2::Transform tfPoint;
@@ -162,17 +155,12 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
     return true;
 }
 
-bool IO::sendPoints(std::vector<std::array<double, 2>> points, std::array<double, 3> color, double width, int id)
+bool IO::sendPoints(std::vector<std::vector<double>> points, std::array<double, 3> color, double width, int id)
 {
     MapConfig mapData;
     if (!comm_->getMapConfig(mapData))
     {
         ROS_ERROR_STREAM("No map data supplied");
-        return false;
-    }
-    if (points.size() < 1)
-    {
-        ROS_ERROR_STREAM("No points supplied");
         return false;
     }
     visualization_msgs::Marker PointMarker;
@@ -190,13 +178,22 @@ bool IO::sendPoints(std::vector<std::array<double, 2>> points, std::array<double
     PointMarker.scale.x = width;
     PointMarker.scale.y = width;
     PointMarker.scale.z = width;
-    for (std::vector<std::array<double, 2>>::iterator it = points.begin(); it != points.end(); ++it)
+    for (std::vector<std::vector<double>>::iterator it = points.begin(); it != points.end(); ++it)
     {
         geometry_msgs::Point point;
         
+        if ((*it).size() < 2)
+        {
+            ROS_WARN_STREAM("Point at index " << std::distance(points.begin(), it) << " has too few dimensions (expected 2, got " << (*it).size() << "), skipping.");
+            continue;
+        }
         point.x = (*it)[0];
         point.y = (*it)[1];
         point.z = 0;
+        if ((*it).size() > 2)
+        {
+            ROS_WARN_STREAM("point at index " << std::distance(points.begin(), it) << " has unused dimensions (expected 2, got " << (*it).size() << ").");
+        }
 
         tf2::Transform tfPoint;
         tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
@@ -213,6 +210,11 @@ bool IO::sendPoints(std::vector<std::array<double, 2>> points, std::array<double
         point.z = tfPoint.getOrigin().z();
         
         PointMarker.points.push_back(point);
+    }
+    if (PointMarker.points.size() < 1)
+    {
+        ROS_ERROR_STREAM("No valid points");
+        return false;
     }
     comm_->sendMarker(PointMarker);
     return true;
