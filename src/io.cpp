@@ -166,25 +166,8 @@ bool IO::sendPoseEstimate(double px, double py, double pz, double rx, double ry,
 {
     // apply map offset and send to comm_
     tf2::Transform pose;
-    MapConfig mapData;
     pose.setOrigin(tf2::Vector3(px, py, pz));
     pose.setRotation(tf2::Quaternion(rx, ry, rz, rw));
-
-    if (comm_->getMapConfig(mapData))
-    {
-        tf2::Transform mapOffset;
-        mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
-        tf2::Quaternion q;
-        q.setRPY(0, 0, mapData.mapOrientation);
-        mapOffset.setRotation(q);
-
-        pose = mapOffset * pose;
-    }
-    else
-    {
-        ROS_ERROR_STREAM("No map data supplied");
-        return false;
-    }
 
     comm_->sendPoseEstimate(tf2::toMsg(pose));
     return true;
