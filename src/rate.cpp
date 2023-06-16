@@ -2,6 +2,7 @@
 
 #include <ros/rate.h>
 #include <ros/ros.h>
+#include <ros/console.h>
 
 namespace emc
 {
@@ -21,7 +22,10 @@ Rate::~Rate()
 void Rate::sleep()
 {
     ros::spinOnce();
-    rate_->sleep();
+    if (!rate_->sleep())
+    {
+        ROS_WARN_STREAM("Could not complete the cycle in " << rate_->expectedCycleTime() << ", instead took " << rate_->cycleTime());
+    }
 }
 
 }
