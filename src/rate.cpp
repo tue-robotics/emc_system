@@ -1,6 +1,7 @@
 #include "emc/rate.h"
 
 #include <ros/rate.h>
+#include <ros/ros.h>
 
 namespace emc
 {
@@ -19,6 +20,7 @@ Rate::~Rate()
 
 void Rate::sleep()
 {
+    ros::spinOnce();
     rate_->sleep();
 }
 
