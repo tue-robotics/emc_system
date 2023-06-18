@@ -147,6 +147,7 @@ private:
     ros::Subscriber sub_mapdata_;
 
     MapConfig mapconfig;
+    std::string robot_frame_name;
 
     void mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg);
 

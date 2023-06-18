@@ -34,6 +34,7 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter " << "open_door_" << " not set");};
     if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
+    if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
 
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
     sub_laser_ = nh.subscribe(laser_sub_options);
@@ -222,7 +223,7 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
     geometry_msgs::TransformStamped transformStamped;
     transformStamped.header.stamp = ros::Time::now();
     transformStamped.header.frame_id = "map";
-    transformStamped.child_frame_id = "internal/base_link";
+    transformStamped.child_frame_id = robot_frame_name;
     transformStamped.transform = pose;
     pub_tf2->sendTransform(transformStamped);
 }
