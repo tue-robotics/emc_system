@@ -1,11 +1,7 @@
 #include "emc/rate.h"
 
 #include <ros/rate.h>
-<<<<<<< HEAD
-#include <ros/ros.h>
 #include <ros/console.h>
-=======
->>>>>>> parent of 5d965d5 (spin when sleeping)
 
 namespace emc
 {
