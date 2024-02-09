@@ -111,4 +111,12 @@ target_link_libraries(emc_example1 emc_system)
 add_executable(emc_example2 examples/example02.cpp)
 target_link_libraries(emc_example2 emc_system)
 
+# ------------------------------------------------------------------------------------------------
+#                                             UNIT TESTS
+# ------------------------------------------------------------------------------------------------
 
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    add_rostest_gtest(tests_io test/io.test test/test_io.cpp)
+    target_link_libraries(tests_io emc_system ${catkin_LIBRARIES})
+endif()
