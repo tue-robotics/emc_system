@@ -117,9 +117,9 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
     for (std::vector<std::vector<double>>::iterator it = path.begin(); it != path.end(); ++it)
     {
         geometry_msgs::Point point;
-        if ((*it).size() < 2)
+        if (it->size() != 2)
         {
-            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
+            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << it->size() << "), skipping.");
             continue;
         }
         point.x = (*it)[0];
