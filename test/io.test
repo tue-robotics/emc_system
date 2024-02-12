@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
   <rosparam command="load" file="$(find emc_system)/test/testbot_mrc_config.yaml" />
   <test test-name="io_tests" pkg="emc_system" type="tests_io" />
