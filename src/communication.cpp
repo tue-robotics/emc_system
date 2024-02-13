@@ -46,9 +46,6 @@ Communication::Communication(std::string /*robot_name*/)
     ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
     sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
 
-    ros::SubscribeOptions mapdata_sub_options = ros::SubscribeOptions::create<nav_msgs::MapMetaData>("/map_metadata", 1, boost::bind(&Communication::mapCallback, this, _1), ros::VoidPtr(), &mapdata_cb_queue_);
-    sub_mapdata_ = nh.subscribe(mapdata_sub_options);
-
     pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
 
     pub_open_door_ = nh.advertise<std_msgs::Empty>(open_door_param, 1);
@@ -201,13 +198,6 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
     pub_tf2->sendTransform(transformStamped);
 }
 
-bool Communication::getMapConfig(MapConfig& config) {
-    if (!mapconfig.mapInitialised)
-        mapdata_cb_queue_.callAvailable(); //try to initialise the map
-    config = mapconfig;
-    return mapconfig.mapInitialised;
-}
-
 // ----------------------------------------------------------------------------------------------------
 
 void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
@@ -236,28 +226,13 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
     bumper_b_msg_ = msg;
 }
 
-void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
+// ----------------------------------------------------------------------------------------------------
+/*
+void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
 {
-    tf2::Quaternion q(msg->origin.orientation.x,
-                      msg->origin.orientation.y,
-                      msg->origin.orientation.z,
-                      msg->origin.orientation.w);
-    
-    tf2::Matrix3x3 T(q);
-
-    double roll, pitch, yaw;
-    T.getRPY(roll, pitch, yaw);
-
-    mapconfig.mapOrientation = yaw + M_PI/2;
-
-    mapconfig.mapResolution = msg->resolution;
-
-    mapconfig.mapOffsetX = (msg->width * mapconfig.mapResolution / 2) * cos(yaw)-(msg->height * mapconfig.mapResolution / 2) * sin(yaw) + msg->origin.position.x;
-    mapconfig.mapOffsetY = (msg->width * mapconfig.mapResolution / 2) * sin(yaw)+(msg->height * mapconfig.mapResolution / 2) * cos(yaw) + msg->origin.position.y;
-    mapconfig.mapInitialised = true;
-    ROS_INFO_STREAM("Map data loaded");
-    sub_mapdata_.shutdown();
+    ce_msg_ = msg;
 }
+*/
 
 } // end namespace emc
 
