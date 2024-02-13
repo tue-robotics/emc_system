@@ -23,34 +23,6 @@
 namespace emc
 {
 
-struct MapConfig{
-
-    /**
-     * @brief The width of each pixel in the map.
-    */
-    double mapResolution;
-
-    /**
-     * @brief The X coordinate of the centre of the map.
-    */
-    double mapOffsetX;
-
-    /**
-     * @brief The Y coordinate of the centre of the map.
-    */
-    double mapOffsetY;
-
-    /**
-     * @brief The rotation of the map.
-    */
-    double mapOrientation;
-
-    /**
-     * @brief Indicates if the map is initialised. if this is false, do not use the data.
-    */
-    bool mapInitialised;
-};
-
 class Communication
 {
 
@@ -83,9 +55,6 @@ public:
 
     // Postion data
     void sendPoseEstimate(const geometry_msgs::Transform& pose);
-
-    // Map data
-    bool getMapConfig(MapConfig& config);
 
 private:
 
@@ -140,16 +109,8 @@ private:
     void bumperfCallback(const std_msgs::BoolConstPtr& msg);
     void bumperbCallback(const std_msgs::BoolConstPtr& msg);
 
-    // Map data
-
-    ros::CallbackQueue mapdata_cb_queue_;
-
-    ros::Subscriber sub_mapdata_;
-
-    MapConfig mapconfig;
+    // pose publishing
     std::string robot_frame_name;
-
-    void mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg);
 
 /*
     // Control effort data
