@@ -26,7 +26,6 @@ catkin_package(
 #  LIBRARIES bla
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
-   CATKIN_DEPENDS message_runtime
 )
 
 # ------------------------------------------------------------------------------------------------
