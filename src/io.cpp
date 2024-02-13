@@ -51,13 +51,6 @@ bool IO::readBackBumperData(BumperData& bumper)
     return comm_->readBackBumperData(bumper);
 }
 
-/*
-bool IO::readControlEffort(ControlEffort& ce)
-{
-    return comm_->readControlEffort(ce);
-}
-*/
-
 void IO::sendBaseReference(double vx, double vy, double va)
 {
     comm_->sendBaseVelocity(vx, vy, va);

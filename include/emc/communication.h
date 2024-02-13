@@ -108,20 +108,6 @@ private:
 
     // pose publishing
     std::string robot_frame_name;
-
-/*
-    // Control effort data
-
-    ros::CallbackQueue ce_cb_queue_;
-
-    ros::Subscriber sub_ce_;
-
-    emc_system::controlEffortConstPtr ce_msg_;
-
-    void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
-*/
-    
-
 };
 
 } // end namespace emc

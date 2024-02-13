@@ -226,13 +226,5 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
     bumper_b_msg_ = msg;
 }
 
-// ----------------------------------------------------------------------------------------------------
-/*
-void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
-{
-    ce_msg_ = msg;
-}
-*/
-
 } // end namespace emc
 
