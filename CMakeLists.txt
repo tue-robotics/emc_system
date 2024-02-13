@@ -18,33 +18,6 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
-#                                     ROS MESSAGES AND SERVICES
-# ------------------------------------------------------------------------------------------------
-
-# Generate messages
-add_message_files(
-   FILES
-   motorCurrent.msg
-   controlEffort.msg
-#    ...
- )
-
-# Generate services
-# add_service_files(
-#    FILES
-#    service1.srv
-#    ...
-# )
-
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-   DEPENDENCIES
-   std_msgs
-#    geometry_msgs
-#    ...
-)
-
-# ------------------------------------------------------------------------------------------------
 #                                          CATKIN EXPORT
 # ------------------------------------------------------------------------------------------------
 
@@ -81,7 +54,6 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
-add_dependencies(emc_system ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(emc_system ${catkin_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------

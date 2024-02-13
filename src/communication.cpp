@@ -10,8 +10,6 @@
 #include <std_msgs/String.h>
 #include <string>
 
-//#include <emc_system/controlEffort.h
-
 namespace emc
 {
 
@@ -41,11 +39,6 @@ Communication::Communication(std::string /*robot_name*/)
 
     ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>(odom_param, 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
     sub_odom_ = nh.subscribe(odom_sub_options);
-
-    /*
-    ros::SubscribeOptions ce_sub_options = ros::SubscribeOptions::create<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, boost::bind(&Communication::controlEffortCallback, this, _1), ros::VoidPtr(), &ce_cb_queue_);
-    sub_ce_ = nh.subscribe(ce_sub_options);
-    */
 
     ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_f_param, 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
     sub_bumper_f_ = nh.subscribe(bumper_f_sub_options);
@@ -153,26 +146,6 @@ bool Communication::readBackBumperData(BumperData& bumper)
     bumper.contact = bumper_b_msg_->data;
     return true;
 }
-
-// ----------------------------------------------------------------------------------------------------
-/*
-bool Communication::readControlEffort(ControlEffort& ce)
-{
-    ce_msg_.reset();
-    ce_cb_queue_.callAvailable();
-
-    if (!ce_msg_)
-        return false;
-
-    ce.x  = ce_msg_->I_x;
-    ce.y  = ce_msg_->I_y;
-    ce.th = ce_msg_->I_th;
-
-    ce.timestamp = ce_msg_->header.stamp.toSec();
-
-    return true;
-}
-*/
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -285,13 +258,6 @@ void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
     ROS_INFO_STREAM("Map data loaded");
     sub_mapdata_.shutdown();
 }
-// ----------------------------------------------------------------------------------------------------
-/*
-void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
-{
-    ce_msg_ = msg;
-}
-*/
 
 } // end namespace emc
 
