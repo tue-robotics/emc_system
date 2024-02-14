@@ -1,33 +1,28 @@
+#include <gtest/gtest.h>
+
 #include <emc/io.h>
-#include <emc/rate.h>
 
-#include <iostream>
+#include <vector>
 
-int main()
+TEST(Io, SendPath)
 {
-    // Create IO object, which will initialize the io layer
     emc::IO io;
 
-    // Create Rate object, which will help using keeping the loop at a fixed frequency
-    emc::Rate r(100);
+    std::vector<double> point;
+    point.push_back(0.0);
+    point.push_back(0.0);
 
-    // Loop while we are properly connected
-    while(io.ok())
-    {
-        // Send a reference to the base controller (vx, vy, vtheta)
-        io.sendBaseReference(0, 0, 0.3);
+    std::vector<std::vector<double>> path;
+    path.push_back(point);
+    path.push_back(point);
 
-        emc::OdometryData odom;
-        if (io.readOdometryData(odom))
-            std::cout << "Odometry: " << odom.x << ", " << odom.y << ", " << odom.a << std::endl;
+    bool res = io.sendPath(path);
+    EXPECT_TRUE(res);
+}
 
-        emc::LaserData scan;
-        if (io.readLaserData(scan))
-            std::cout << "Laser: " << scan.ranges.size() << " beams" << std::endl;
-
-        // Sleep remaining time
-        r.sleep();
-    }
-
-    return 0;
+// Run all the tests that were declared with TEST()
+int main(int argc, char **argv)
+{
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

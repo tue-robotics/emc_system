@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     nav_msgs
     roscpp
-    message_generation
     tf2
     tf2_ros    
 )
@@ -17,33 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system program_options)
 # find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
-
-# ------------------------------------------------------------------------------------------------
-#                                     ROS MESSAGES AND SERVICES
-# ------------------------------------------------------------------------------------------------
-
-# Generate messages
-add_message_files(
-   FILES
-   motorCurrent.msg
-   controlEffort.msg
-#    ...
- )
-
-# Generate services
-# add_service_files(
-#    FILES
-#    service1.srv
-#    ...
-# )
-
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-   DEPENDENCIES
-   std_msgs
-#    geometry_msgs
-#    ...
-)
 
 # ------------------------------------------------------------------------------------------------
 #                                          CATKIN EXPORT
@@ -54,7 +26,6 @@ catkin_package(
 #  LIBRARIES bla
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
-   CATKIN_DEPENDS message_runtime
 )
 
 # ------------------------------------------------------------------------------------------------
@@ -82,7 +53,6 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
-add_dependencies(emc_system ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(emc_system ${catkin_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------
@@ -96,8 +66,11 @@ target_link_libraries(emc_viz emc_system ${OpenCV_LIBRARIES})
 #                                               IO
 # ------------------------------------------------------------------------------------------------
 
-add_executable(emc_test_io test/test_io.cpp)
+add_executable(emc_test_io examples/test_io.cpp)
 target_link_libraries(emc_test_io emc_system)
+
+add_executable(testspeech examples/testspeech.cpp)
+target_link_libraries(testspeech emc_system)
 
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
@@ -109,5 +82,12 @@ target_link_libraries(emc_example1 emc_system)
 add_executable(emc_example2 examples/example02.cpp)
 target_link_libraries(emc_example2 emc_system)
 
-add_executable(testspeech test/testspeech.cpp)
-target_link_libraries(testspeech emc_system)
+# ------------------------------------------------------------------------------------------------
+#                                             UNIT TESTS
+# ------------------------------------------------------------------------------------------------
+
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    add_rostest_gtest(tests_io test/io.test test/test_io.cpp)
+    target_link_libraries(tests_io emc_system ${catkin_LIBRARIES})
+endif()

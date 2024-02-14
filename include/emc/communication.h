@@ -16,7 +16,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
-#include <emc_system/controlEffort.h>
 #include <string>
 #include <memory>
 
@@ -40,8 +39,6 @@ public:
 
     bool readFrontBumperData(BumperData& bumper);
     bool readBackBumperData(BumperData& bumper);
-
-    //bool readControlEffort(ControlEffort& ce);
 
     void sendBaseVelocity(double vx, double vy, double va);
 
@@ -111,20 +108,6 @@ private:
 
     // pose publishing
     std::string robot_frame_name;
-
-/*
-    // Control effort data
-
-    ros::CallbackQueue ce_cb_queue_;
-
-    ros::Subscriber sub_ce_;
-
-    emc_system::controlEffortConstPtr ce_msg_;
-
-    void controlEffortCallback(const emc_system::controlEffortConstPtr& msg);
-*/
-    
-
 };
 
 } // end namespace emc
