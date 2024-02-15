@@ -36,7 +36,8 @@ public:
     /**
      * @brief Receive new odometrydata if available
      * 
-     * @param odom reference to an OdometryData object to write the new data to
+     * @param[out] odom reference to an OdometryData object to write the new data to. provides displacement since
+     *  last time this function or resetOdometry() was called.
      * @return true if new data was available
      * @return false if not
      */
@@ -154,7 +155,10 @@ private:
      */
     bool sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
 
+    // odometry memory
     OdometryData prev_odom;
+    bool odom_set = false; // wether odom has been set at least once.
+
     Communication* comm_;
 
 };

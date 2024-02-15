@@ -43,6 +43,14 @@ bool IO::readOdometryData(OdometryData& odom)
     if (!newdata)
         return false;
 
+    if (!odom_set)
+    {
+        ROS_WARN("Odom was not yet set. It is set now.");
+        prev_odom = new_odom;
+        odom_set = true;
+        return false;
+    }
+
     odom.timestamp = new_odom.timestamp; //TODO give dt?
     double dx = new_odom.x - prev_odom.x;
     double dy = new_odom.y - prev_odom.y;
@@ -56,8 +64,13 @@ bool IO::readOdometryData(OdometryData& odom)
 
 bool IO::resetOdometry()
 {
-    OdometryData odom;
-    return readOdometryData(odom);
+    OdometryData new_odom;
+    bool newdata = comm_->readOdometryData(new_odom);
+    if (!newdata)
+        return false;
+    prev_odom = new_odom;
+    odom_set = true;
+    return true;
 }
 
 bool IO::readFrontBumperData(BumperData& bumper)
