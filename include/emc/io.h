@@ -43,6 +43,13 @@ public:
     bool readOdometryData(OdometryData& odom);
 
     /**
+     * @brief Set the current position as (0,0,0)
+     * 
+     * @return true if new data was available to reset, false if not
+    */
+    bool resetOdometry();
+
+    /**
      * @brief Receive new BumperData from the front bumper
      * 
      * @param bumper Bumberdata object to write the new data to, untouched if no data is available
@@ -147,6 +154,7 @@ private:
      */
     bool sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
 
+    OdometryData prev_odom;
     Communication* comm_;
 
 };

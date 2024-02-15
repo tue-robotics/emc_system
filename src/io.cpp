@@ -38,8 +38,27 @@ bool IO::readLaserData(LaserData& scan)
 
 bool IO::readOdometryData(OdometryData& odom)
 {
-    return comm_->readOdometryData(odom);
+    OdometryData new_odom;
+    bool newdata = comm_->readOdometryData(new_odom);
+    if (!newdata)
+        return false;
+
+    odom.timestamp = new_odom.timestamp; //TODO give dt?
+    double dx = new_odom.x - prev_odom.x;
+    double dy = new_odom.y - prev_odom.y;
+    odom.x = cos(prev_odom.a) * dx + sin(prev_odom.a) * dy;
+    odom.y = -sin(prev_odom.a) * dx + cos(prev_odom.a) * dy;
+    odom.a = fmod(new_odom.a - prev_odom.a + M_PI, 2*M_PI) - M_PI;
+
+    prev_odom = new_odom;
+    return true;
 }  
+
+bool IO::resetOdometry()
+{
+    OdometryData odom;
+    return readOdometryData(odom);
+}
 
 bool IO::readFrontBumperData(BumperData& bumper)
 {
