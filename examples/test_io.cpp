@@ -9,7 +9,7 @@ int main()
     emc::IO io;
 
     // Create Rate object, which will help using keeping the loop at a fixed frequency
-    emc::Rate r(100);
+    emc::Rate r(10);
 
     // Loop while we are properly connected
     while(io.ok())
