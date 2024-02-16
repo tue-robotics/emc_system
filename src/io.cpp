@@ -52,13 +52,13 @@ bool IO::readOdometryData(OdometryData& odom)
     }
 
     odom.timestamp = new_odom.timestamp; //TODO give dt?
-    double dx = new_odom.x - prev_odom.x;
-    double dy = new_odom.y - prev_odom.y;
-    odom.x = cos(prev_odom.a) * dx + sin(prev_odom.a) * dy;
+    double dx = new_odom.x - prev_odom_.x;
+    double dy = new_odom.y - prev_odom_.y;
+    odom.x = cos(prev_odom_.a) * dx + sin(prev_odom_.a) * dy;
     odom.y = -sin(prev_odom.a) * dx + cos(prev_odom.a) * dy;
-    odom.a = fmod(new_odom.a - prev_odom.a + M_PI, 2*M_PI) - M_PI;
+    odom.a = fmod(new_odom.a - prev_odom_.a + M_PI, 2*M_PI) - M_PI;
 
-    prev_odom = new_odom;
+    prev_odom_ = new_odom;
     return true;
 }  
 
