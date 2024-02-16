@@ -39,8 +39,7 @@ bool IO::readLaserData(LaserData& scan)
 bool IO::readOdometryData(OdometryData& odom)
 {
     OdometryData new_odom;
-    bool newdata = comm_->readOdometryData(new_odom);
-    if (!newdata)
+    if (!comm_->readOdometryData(new_odom))
         return false;
 
     if (!odom_set_)
