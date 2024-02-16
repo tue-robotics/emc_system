@@ -43,11 +43,11 @@ bool IO::readOdometryData(OdometryData& odom)
     if (!newdata)
         return false;
 
-    if (!odom_set)
+    if (!odom_set_)
     {
         ROS_WARN("Odom was not yet set. It is set now.");
-        prev_odom = new_odom;
-        odom_set = true;
+        prev_odom_ = new_odom;
+        odom_set_ = true;
         return false;
     }
 
