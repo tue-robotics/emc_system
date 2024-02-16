@@ -156,8 +156,8 @@ private:
     bool sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
 
     // odometry memory
-    OdometryData prev_odom;
-    bool odom_set = false; // wether odom has been set at least once.
+    OdometryData prev_odom_;
+    bool odom_set_ = false; // wether odom has been set at least once.
 
     Communication* comm_;
 
