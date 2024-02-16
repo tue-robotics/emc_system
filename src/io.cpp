@@ -54,7 +54,7 @@ bool IO::readOdometryData(OdometryData& odom)
     double dx = new_odom.x - prev_odom_.x;
     double dy = new_odom.y - prev_odom_.y;
     odom.x = cos(prev_odom_.a) * dx + sin(prev_odom_.a) * dy;
-    odom.y = -sin(prev_odom.a) * dx + cos(prev_odom.a) * dy;
+    odom.y = -sin(prev_odom_.a) * dx + cos(prev_odom_.a) * dy;
     odom.a = fmod(new_odom.a - prev_odom_.a + M_PI, 2*M_PI) - M_PI;
 
     prev_odom_ = new_odom;
