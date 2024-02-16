@@ -68,8 +68,8 @@ bool IO::resetOdometry()
     bool newdata = comm_->readOdometryData(new_odom);
     if (!newdata)
         return false;
-    prev_odom = new_odom;
-    odom_set = true;
+    prev_odom_ = new_odom;
+    odom_set_ = true;
     return true;
 }
 
