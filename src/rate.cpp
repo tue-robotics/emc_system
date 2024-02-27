@@ -1,29 +1,26 @@
 #include "emc/rate.h"
 
-#include <ros/rate.h>
-#include <ros/console.h>
 
-namespace emc
+emc::Rate2::Rate2(double freq)
 {
-
-Rate::Rate(double freq)
-{
-    ros::Time::init();
-    rate_ = new ros::Rate(freq);
+    //rclcpp::Time::init();
+    rate_ = new rclcpp::Rate(freq);
+    //logger_ = rclcpp::get_logger("ratelogger");
 }
 
-Rate::~Rate()
+emc::Rate2::~Rate2()
 {
     if (rate_)
-        delete rate_;
-}
-
-void Rate::sleep()
-{
-    if (!rate_->sleep())
     {
-        ROS_WARN_STREAM("Could not complete the cycle in " << rate_->expectedCycleTime() << ", instead took " << rate_->cycleTime());
+        delete rate_;
     }
 }
 
+void emc::Rate2::sleep()
+{
+    if (!rate_->sleep())
+    {
+        RCLCPP_WARN_STREAM(rclcpp::get_logger("ratelogger"), "Could not complete the cycle in "); //<< rate_->period() << ", instead took ??");
+    }
 }
+

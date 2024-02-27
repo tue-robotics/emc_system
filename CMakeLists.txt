@@ -29,7 +29,7 @@ include_directories(
 )
 
 add_library(emc_system
-    include/emc/engine.h
+    #include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
     include/emc/odom.h
@@ -37,9 +37,9 @@ add_library(emc_system
     include/emc/rate.h
     include/emc/bumper.h
 
-    src/engine.cpp
+    #src/engine.cpp
     src/communication.cpp
-    src/data.cpp
+    #src/data.cpp
     src/io.cpp
     src/rate.cpp
 )

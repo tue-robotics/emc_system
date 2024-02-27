@@ -2,13 +2,13 @@
 
 #include "emc/communication.h"
 
-#include <ros/init.h>  // for ros::ok()
+//#include <ros/init.h>  // for ros::ok()
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Quaternion.h>
-#include <geometry_msgs/Vector3.h>
-#include <visualization_msgs/Marker.h>
+#include <geometry_msgs/msg/pose.h>
+#include <geometry_msgs/msg/quaternion.h>
+#include <geometry_msgs/msg/vector3.h>
+#include <visualization_msgs/msg/marker.h>
 
 #include <string>
 
@@ -83,7 +83,7 @@ void IO::play(const std::string& file)
 
 bool IO::ok()
 {
-    return ros::ok();
+    return rclcpp::ok();
 }
 
 bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)

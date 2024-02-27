@@ -1,13 +1,10 @@
 #include "emc/communication.h"
 
-#include <ros/node_handle.h>
-#include <ros/subscribe_options.h>
+//#include <ros/node_handle.h>
+//#include <ros/subscribe_options.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 
-#include <geometry_msgs/Twist.h>
-#include <std_msgs/Empty.h>
-#include <std_msgs/String.h>
 #include <string>
 
 namespace emc
@@ -34,6 +31,18 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
 
+    sub_laser_ = this->create_subscription<sensor_msgs::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, _1));
+    sub_odom_ = this->create_subscription<nav_msgs::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, _1));
+    sub_bumper_f_ = this->create_subscription<std_msgs::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, _1));
+    sub_bumper_b_ = this->create_subscription<std_msgs::Bool>(bumper_b_param, 10, std::bind(&Communication::bumperbCallback, this, _1));
+
+    pub_cmd_vel_ = this->create_publisher<geometry_msgs::Twist>(base_ref_param, 10);
+    pub_open_door_ = this->create_publisher<std_msgs::Empty>(open_door_param, 10);
+    pub_speak_ = this->create_publisher<std_msgs::String>(speak_param, 10);
+    pub_play_ = this->create_publisher<std_msgs::String>(play_param, 10);
+    pub_marker = this->create_publisher<std_msgs::String>("/marker", 10);
+
+/*
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
     sub_laser_ = nh.subscribe(laser_sub_options);
 
@@ -54,7 +63,7 @@ Communication::Communication(std::string /*robot_name*/)
     pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
 
     pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
-
+*/
     pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
 }
 
@@ -148,7 +157,7 @@ bool Communication::readBackBumperData(BumperData& bumper)
 
 void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
-    geometry_msgs::Twist ref;
+    geometry_msgs::msg::Twist ref;
     ref.linear.x = vx;
     ref.linear.y = vy;
     ref.angular.z = va;
@@ -160,13 +169,13 @@ void Communication::sendBaseVelocity(double vx, double vy, double va)
 
 void Communication::sendOpendoorRequest()
 {
-    std_msgs::Empty msg;
+    std_msgs::msg::Empty msg;
     pub_open_door_.publish(msg);
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::sendMarker(visualization_msgs::Marker marker)
+void Communication::sendMarker(visualization_msgs::msg::Marker marker)
 {
     pub_marker_.publish(marker);
 }
@@ -175,22 +184,22 @@ void Communication::sendMarker(visualization_msgs::Marker marker)
 
 void Communication::speak(const std::string& text)
 {
-    std_msgs::String str;
+    std_msgs::msg::String str;
     str.data = text;
     pub_speak_.publish(str);
 }
 
 void Communication::play(const std::string& file)
 {
-    std_msgs::String str;
+    std_msgs::msg::String str;
     str.data = file;
     pub_play_.publish(str);
 }
 
-void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
+void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
 {
     // Publish tf transform
-    geometry_msgs::TransformStamped transformStamped;
+    geometry_msgs::msg::TransformStamped transformStamped;
     transformStamped.header.stamp = ros::Time::now();
     transformStamped.header.frame_id = "map";
     transformStamped.child_frame_id = robot_frame_name;
@@ -200,28 +209,28 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
+void Communication::laserCallback(const sensor_msgs::msg::LaserScanConstPtr& msg)
 {
     laser_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
+void Communication::odomCallback(const nav_msgs::msg::OdometryConstPtr& msg)
 {
     odom_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
+void Communication::bumperfCallback(const std_msgs::msg::BoolConstPtr& msg)
 {
     bumper_f_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
+void Communication::bumperbCallback(const std_msgs::msg::BoolConstPtr& msg)
 {
     bumper_b_msg_ = msg;
 }
