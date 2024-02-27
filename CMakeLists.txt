@@ -1,17 +1,18 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(emc_system)
 
+set(CMAKE_CXX_STANDARD 14)
+
 add_compile_options(-Wall -Werror=all)
 add_compile_options(-Wextra -Werror=extra)
 
-find_package(catkin REQUIRED COMPONENTS
-    geometry_msgs
-    sensor_msgs
-    nav_msgs
-    roscpp
-    tf2
-    tf2_ros    
-)
+find_package(ament_cmake REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(roscpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
 # find_package(PCL REQUIRED)
@@ -21,11 +22,8 @@ find_package(OpenCV REQUIRED)
 #                                          CATKIN EXPORT
 # ------------------------------------------------------------------------------------------------
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES bla
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+ament_package(
+
 )
 
 # ------------------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
-target_link_libraries(emc_system ${catkin_LIBRARIES})
+ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros)
 
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
@@ -86,8 +84,9 @@ target_link_libraries(emc_example2 emc_system)
 #                                             UNIT TESTS
 # ------------------------------------------------------------------------------------------------
 
-if(CATKIN_ENABLE_TESTING)
+if(BUILD_TESTING)
     find_package(rostest REQUIRED)
     add_rostest_gtest(tests_io test/io.test test/test_io.cpp)
-    target_link_libraries(tests_io emc_system ${catkin_LIBRARIES})
+    target_link_libraries(tests_io emc_system)
+    ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros)
 endif()
