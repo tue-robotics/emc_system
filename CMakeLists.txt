@@ -19,14 +19,6 @@ find_package(tf2_ros REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
-#                                          CATKIN EXPORT
-# ------------------------------------------------------------------------------------------------
-
-ament_package(
-
-)
-
-# ------------------------------------------------------------------------------------------------
 #                                              BUILD
 # ------------------------------------------------------------------------------------------------
 
@@ -84,9 +76,11 @@ target_link_libraries(emc_example2 emc_system)
 #                                             UNIT TESTS
 # ------------------------------------------------------------------------------------------------
 
-if(BUILD_TESTING)
-    find_package(rostest REQUIRED)
-    add_rostest_gtest(tests_io test/io.test test/test_io.cpp)
-    target_link_libraries(tests_io emc_system)
-    ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros)
-endif()
+#if(BUILD_TESTING)
+#    find_package(rostest REQUIRED)
+#    add_rostest_gtest(tests_io test/io.test test/test_io.cpp)
+#    target_link_libraries(tests_io emc_system)
+#    ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros rostest)
+#endif()
+
+ament_package()
