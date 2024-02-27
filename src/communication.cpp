@@ -31,16 +31,16 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
 
-    sub_laser_ = this->create_subscription<sensor_msgs::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, _1));
-    sub_odom_ = this->create_subscription<nav_msgs::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, _1));
-    sub_bumper_f_ = this->create_subscription<std_msgs::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, _1));
-    sub_bumper_b_ = this->create_subscription<std_msgs::Bool>(bumper_b_param, 10, std::bind(&Communication::bumperbCallback, this, _1));
+    sub_laser_ = this->create_subscription<sensor_msgs::msg::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, _1));
+    sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, _1));
+    sub_bumper_f_ = this->create_subscription<std_msgs::msg::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, _1));
+    sub_bumper_b_ = this->create_subscription<std_msgs::msg::Bool>(bumper_b_param, 10, std::bind(&Communication::bumperbCallback, this, _1));
 
-    pub_cmd_vel_ = this->create_publisher<geometry_msgs::Twist>(base_ref_param, 10);
-    pub_open_door_ = this->create_publisher<std_msgs::Empty>(open_door_param, 10);
-    pub_speak_ = this->create_publisher<std_msgs::String>(speak_param, 10);
-    pub_play_ = this->create_publisher<std_msgs::String>(play_param, 10);
-    pub_marker = this->create_publisher<std_msgs::String>("/marker", 10);
+    pub_cmd_vel_ = this->create_publisher<geometry_msgs::msg::Twist>(base_ref_param, 10);
+    pub_open_door_ = this->create_publisher<std_msgs::msg::Empty>(open_door_param, 10);
+    pub_speak_ = this->create_publisher<std_msgs::msg::String>(speak_param, 10);
+    pub_play_ = this->create_publisher<std_msgs::msg::String>(play_param, 10);
+    pub_marker = this->create_publisher<std_msgs::msg::String>("/marker", 10);
 
 /*
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
@@ -209,28 +209,28 @@ void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::laserCallback(const sensor_msgs::msg::LaserScanConstPtr& msg)
+void Communication::laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
     laser_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::odomCallback(const nav_msgs::msg::OdometryConstPtr& msg)
+void Communication::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
     odom_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperfCallback(const std_msgs::msg::BoolConstPtr& msg)
+void Communication::bumperfCallback(const std_msgs::msg::Bool::SharedPtr msg)
 {
     bumper_f_msg_ = msg;
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void Communication::bumperbCallback(const std_msgs::msg::BoolConstPtr& msg)
+void Communication::bumperbCallback(const std_msgs::msg::Bool::SharedPtr msg)
 {
     bumper_b_msg_ = msg;
 }

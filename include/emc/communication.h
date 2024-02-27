@@ -14,9 +14,9 @@
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <nav_msgs/msg/odometry.hpp>
-#include <geometry_msgs/msg/twist.h>
-#include <std_msgs/msg/empty.h>
-#include <std_msgs/msg/string.h>
+#include <geometry_msgs/msg/twist.hpp>
+#include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/string.hpp>
 
 #include <string>
 #include <memory>
@@ -53,16 +53,16 @@ public:
     void play(const std::string& file);
 
     // Postion data
-    void sendPoseEstimate(const geometry_msgs::Transform& pose);
+    void sendPoseEstimate(const geometry_msgs::msg::Transform& pose);
 
 private:
 
     // Base velocity reference
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_base_ref_;
     rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_open_door_;
-    rclcpp::Publisher<std_msg::msg::String>::SharedPtr pub_speak_;
-    rclcpp::Publisher<std_msg::msg::String>::SharedPtr pub_play_;
-    rclcpp::Publisher<visualization_msg::msg::Marker>::SharedPtr pub_marker_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_speak_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_play_;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_marker_;
 
     // Position data
 
@@ -70,32 +70,30 @@ private:
 
 
     // Laser data
-    rclcpp::Subscription<sensor_msgs::msg::LaserData>::SharedPtr sub_laser_;
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_laser_;
 
-    ros::Subscriber sub_laser_;
+    sensor_msgs::msg::LaserScan::SharedPtr laser_msg_;
 
-    sensor_msgs::msg::LaserScanConstPtr laser_msg_;
-
-    void laserCallback(const sensor_msgs::msg::LaserScanConstPtr& msg);
+    void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
 
 
     // Odometry data
 
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
 
-    nav_msgs::msg::OdometryConstPtr odom_msg_;
+    nav_msgs::msg::Odometry::SharedPtr odom_msg_;
 
-    void odomCallback(const nav_msgs::msg::OdometryConstPtr& msg);
+    void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
 
     // Bumper data
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_f_;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_b_;
 
-    std_msgs::msg::BoolConstPtr bumper_f_msg_;
-    std_msgs::msg::BoolConstPtr bumper_b_msg_;
+    std_msgs::msg::Bool::SharedPtr bumper_f_msg_;
+    std_msgs::msg::Bool::SharedPtr bumper_b_msg_;
 
-    void bumperfCallback(const std_msgs::msg::BoolConstPtr& msg);
-    void bumperbCallback(const std_msgs::msg::BoolConstPtr& msg);
+    void bumperfCallback(const std_msgs::msg::Bool::SharedPtr msg);
+    void bumperbCallback(const std_msgs::msg::Bool::SharedPtr msg);
 
     // pose publishing
     std::string robot_frame_name;
