@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
-find_package(roscpp REQUIRED)
+find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 
@@ -43,7 +43,7 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
-ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros)
+ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs rclcpp tf2 tf2_ros)
 
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
