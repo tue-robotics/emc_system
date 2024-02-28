@@ -20,11 +20,16 @@ namespace emc
 IO::IO(Communication* comm) : comm_(comm)
 {
     if (!comm_)
+    {
+        rclcpp::init(0,nullptr);
         comm_ = new Communication;
+    }
 }
 
-IO::IO(std::string robot_name) : comm_(new Communication(robot_name))
+IO::IO(std::string robot_name)
 {
+    rclcpp::init(0,nullptr);
+    comm_ = new Communication(robot_name);
 }
 
 IO::~IO()
