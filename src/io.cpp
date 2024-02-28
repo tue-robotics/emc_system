@@ -88,13 +88,13 @@ bool IO::ok()
 
 bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
 {
-    visualization_msgs::Marker pathMarker;
+    visualization_msgs::msg::Marker pathMarker;
     pathMarker.header.frame_id = "map";
     pathMarker.header.stamp = ros::Time();
     pathMarker.ns = "path";
     pathMarker.id = id;
-    pathMarker.type = visualization_msgs::Marker::LINE_STRIP;
-    pathMarker.action = visualization_msgs::Marker::ADD;
+    pathMarker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+    pathMarker.action = visualization_msgs::msg::Marker::ADD;
     pathMarker.color.a = 1.0;
     pathMarker.color.r = color[0];
     pathMarker.color.g = color[1];
@@ -103,7 +103,7 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
     pathMarker.scale.x = width;
     for (std::vector<std::vector<double>>::iterator it = path.begin(); it != path.end(); ++it)
     {
-        geometry_msgs::Point point;
+        geometry_msgs::msg::Point point;
         if ((*it).size() < 2)
         {
             ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");

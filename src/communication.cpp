@@ -12,15 +12,26 @@ namespace emc
 
 // ----------------------------------------------------------------------------------------------------
 
-Communication::Communication(std::string /*robot_name*/)
+Communication::Communication(std::string /*robot_name*/) : rclcpp::Node("emc_system")
 {
-
+/*
     ros::VP_string args;
     ros::init(args, "emc_system", ros::init_options::AnonymousName);
     ros::Time::init();
-
-    ros::NodeHandle nh;
+*/
+  //  ros::NodeHandle nh;
     std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
+    // temp hardcode param names
+    laser_param = "laser_scan";
+    odom_param = "odom";
+    bumper_f_param = "bumper_f";
+    bumper_b_param = "bumper_b";
+    base_ref_param = "cmd_vel";
+    open_door_param = "open_door";
+    speak_param = "speak";
+    play_param = "play";
+    /*
+    // get robot parameters
     if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
     if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
     if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
@@ -30,7 +41,7 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
-
+*/
     sub_laser_ = this->create_subscription<sensor_msgs::msg::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, _1));
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, _1));
     sub_bumper_f_ = this->create_subscription<std_msgs::msg::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, _1));
@@ -40,7 +51,7 @@ Communication::Communication(std::string /*robot_name*/)
     pub_open_door_ = this->create_publisher<std_msgs::msg::Empty>(open_door_param, 10);
     pub_speak_ = this->create_publisher<std_msgs::msg::String>(speak_param, 10);
     pub_play_ = this->create_publisher<std_msgs::msg::String>(play_param, 10);
-    pub_marker = this->create_publisher<std_msgs::msg::String>("/marker", 10);
+    pub_marker_ = this->create_publisher<std_msgs::msg::String>("/marker", 10);
 
 /*
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
@@ -85,7 +96,7 @@ void Communication::init()
 bool Communication::readLaserData(LaserData& scan)
 {
     laser_msg_.reset();
-    laser_cb_queue_.callAvailable();
+    //laser_cb_queue_.callAvailable();
 
     if (!laser_msg_)
         return false;
@@ -106,7 +117,7 @@ bool Communication::readLaserData(LaserData& scan)
 bool Communication::readOdometryData(OdometryData& odom)
 {
     odom_msg_.reset();
-    odom_cb_queue_.callAvailable();
+    //odom_cb_queue_.callAvailable();
 
     if (!odom_msg_)
         return false;
@@ -129,7 +140,7 @@ bool Communication::readFrontBumperData(BumperData& bumper)
 {
     bumper_f_msg_.reset();
 
-    bumper_f_cb_queue_.callAvailable();
+    //bumper_f_cb_queue_.callAvailable();
 
     if (!bumper_f_msg_)
         return false;
@@ -144,7 +155,7 @@ bool Communication::readBackBumperData(BumperData& bumper)
 {
     bumper_b_msg_.reset();
 
-    bumper_b_cb_queue_.callAvailable();
+    //bumper_b_cb_queue_.callAvailable();
 
     if (!bumper_b_msg_)
         return false;
@@ -162,7 +173,7 @@ void Communication::sendBaseVelocity(double vx, double vy, double va)
     ref.linear.y = vy;
     ref.angular.z = va;
 
-    pub_base_ref_.publish(ref);
+    pub_cmd_vel_->publish(ref);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -170,14 +181,14 @@ void Communication::sendBaseVelocity(double vx, double vy, double va)
 void Communication::sendOpendoorRequest()
 {
     std_msgs::msg::Empty msg;
-    pub_open_door_.publish(msg);
+    pub_open_door_->publish(msg);
 }
 
 // ----------------------------------------------------------------------------------------------------
 
 void Communication::sendMarker(visualization_msgs::msg::Marker marker)
 {
-    pub_marker_.publish(marker);
+    pub_marker_->publish(marker);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -186,14 +197,14 @@ void Communication::speak(const std::string& text)
 {
     std_msgs::msg::String str;
     str.data = text;
-    pub_speak_.publish(str);
+    pub_speak_->publish(str);
 }
 
 void Communication::play(const std::string& file)
 {
     std_msgs::msg::String str;
     str.data = file;
-    pub_play_.publish(str);
+    pub_play_->publish(str);
 }
 
 void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)

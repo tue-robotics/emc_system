@@ -58,7 +58,7 @@ public:
 private:
 
     // Base velocity reference
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_base_ref_;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_cmd_vel_;
     rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_open_door_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_speak_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_play_;
