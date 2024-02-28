@@ -1,11 +1,12 @@
 #include "emc/communication.h"
 
+#include <functional>
+#include <string>
+
 //#include <ros/node_handle.h>
 //#include <ros/subscribe_options.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-
-#include <string>
 
 namespace emc
 {
@@ -42,16 +43,16 @@ Communication::Communication(std::string /*robot_name*/) : rclcpp::Node("emc_sys
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
 */
-    sub_laser_ = this->create_subscription<sensor_msgs::msg::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, _1));
-    sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, _1));
-    sub_bumper_f_ = this->create_subscription<std_msgs::msg::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, _1));
-    sub_bumper_b_ = this->create_subscription<std_msgs::msg::Bool>(bumper_b_param, 10, std::bind(&Communication::bumperbCallback, this, _1));
+    sub_laser_ = this->create_subscription<sensor_msgs::msg::LaserScan>(laser_param, 10, std::bind(&Communication::laserCallback, this, std::placeholders::_1));
+    sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(odom_param, 10, std::bind(&Communication::odomCallback, this, std::placeholders::_1));
+    sub_bumper_f_ = this->create_subscription<std_msgs::msg::Bool>(bumper_f_param, 10, std::bind(&Communication::bumperfCallback, this, std::placeholders::_1));
+    sub_bumper_b_ = this->create_subscription<std_msgs::msg::Bool>(bumper_b_param, 10, std::bind(&Communication::bumperbCallback, this, std::placeholders::_1));
 
     pub_cmd_vel_ = this->create_publisher<geometry_msgs::msg::Twist>(base_ref_param, 10);
     pub_open_door_ = this->create_publisher<std_msgs::msg::Empty>(open_door_param, 10);
     pub_speak_ = this->create_publisher<std_msgs::msg::String>(speak_param, 10);
     pub_play_ = this->create_publisher<std_msgs::msg::String>(play_param, 10);
-    pub_marker_ = this->create_publisher<std_msgs::msg::String>("/marker", 10);
+    pub_marker_ = this->create_publisher<visualization_msgs::msg::Marker>("/marker", 10);
 
 /*
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
@@ -126,7 +127,7 @@ bool Communication::readOdometryData(OdometryData& odom)
     odom.y = odom_msg_->pose.pose.position.y;
 
     // Calculate yaw rotation from quaternion
-    const geometry_msgs::Quaternion& q = odom_msg_->pose.pose.orientation;
+    const geometry_msgs::msg::Quaternion& q = odom_msg_->pose.pose.orientation;
     odom.a = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
 
     odom.timestamp = odom_msg_->header.stamp.toSec();

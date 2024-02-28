@@ -2,6 +2,8 @@
 
 #include "emc/communication.h"
 
+#include "rclcpp/rclcpp.hpp"
+
 //#include <ros/init.h>  // for ros::ok()
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -106,7 +108,7 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
         geometry_msgs::msg::Point point;
         if ((*it).size() < 2)
         {
-            ROS_WARN_STREAM("Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
+            RCLCPP_WARN_STREAM(comm_->get_logger(), "Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
             continue;
         }
         point.x = (*it)[0];
@@ -120,14 +122,14 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
             point.z = (*it)[3];
             if ((*it).size() > 3)
             {
-                ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
+                RCLCPP_WARN_STREAM(comm_->get_logger(), "point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
             }
         }
         pathMarker.points.push_back(point);
     }
     if (pathMarker.points.size() < 2)
     {
-        ROS_ERROR_STREAM("Not enough valid points (expected at least 2, got " << pathMarker.points.size() << ").");
+        RCLCPP_ERROR_STREAM(comm_->get_logger(), "Not enough valid points (expected at least 2, got " << pathMarker.points.size() << ").");
         return false;
     }
     comm_->sendMarker(pathMarker);
