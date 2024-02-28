@@ -64,10 +64,9 @@ private:
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_play_;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_marker_;
 
-    // Position data
-
-    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2; //has to be defined after ros::init(), which is called in the constructor
-
+    // pose publishing
+    std::string robot_frame_name;
+    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2_; //has to be defined after ros::init(), which is called in the constructor
 
     // Laser data
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_laser_;
@@ -95,8 +94,6 @@ private:
     void bumperfCallback(const std_msgs::msg::Bool::SharedPtr msg);
     void bumperbCallback(const std_msgs::msg::Bool::SharedPtr msg);
 
-    // pose publishing
-    std::string robot_frame_name;
 };
 
 } // end namespace emc

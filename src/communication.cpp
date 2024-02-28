@@ -76,7 +76,8 @@ Communication::Communication(std::string /*robot_name*/) : rclcpp::Node("emc_sys
 
     pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
 */
-    pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
+    pub_tf2_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+    //pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -216,7 +217,7 @@ void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
     transformStamped.header.frame_id = "map";
     transformStamped.child_frame_id = robot_frame_name;
     transformStamped.transform = pose;
-    pub_tf2->sendTransform(transformStamped);
+    pub_tf2_->sendTransform(transformStamped);
 }
 
 // ----------------------------------------------------------------------------------------------------
