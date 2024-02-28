@@ -60,8 +60,8 @@ target_link_libraries(emc_viz emc_system ${OpenCV_LIBRARIES})
 add_executable(emc_test_io examples/test_io.cpp)
 target_link_libraries(emc_test_io emc_system)
 
-add_executable(testspeech examples/testspeech.cpp)
-target_link_libraries(testspeech emc_system)
+add_executable(emc_test_speech examples/testspeech.cpp)
+target_link_libraries(emc_test_speech emc_system)
 
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
@@ -83,5 +83,12 @@ target_link_libraries(emc_example1 emc_system)
 #    target_link_libraries(tests_io emc_system)
 #    ament_target_dependencies(emc_system geometry_msgs sensor_msgs nav_msgs roscpp tf2 tf2_ros rostest)
 #endif()
+
+#############
+## Install ##
+#############
+install(TARGETS emc_example1 emc_test_io emc_test_speech
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_package()
