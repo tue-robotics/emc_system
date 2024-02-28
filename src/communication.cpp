@@ -108,7 +108,7 @@ bool Communication::readLaserData(LaserData& scan)
     scan.angle_min = laser_msg_->angle_min;
     scan.angle_max = laser_msg_->angle_max;
     scan.angle_increment = laser_msg_->angle_increment;
-    scan.timestamp = laser_msg_->header.stamp.toSec();
+    scan.timestamp = rclcpp::Time(laser_msg_->header.stamp).seconds();
 
     return true;
 }
@@ -130,7 +130,7 @@ bool Communication::readOdometryData(OdometryData& odom)
     const geometry_msgs::msg::Quaternion& q = odom_msg_->pose.pose.orientation;
     odom.a = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
 
-    odom.timestamp = odom_msg_->header.stamp.toSec();
+    odom.timestamp = rclcpp::Time(odom_msg_->header.stamp).seconds();
 
     return true;
 }
@@ -212,7 +212,7 @@ void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
 {
     // Publish tf transform
     geometry_msgs::msg::TransformStamped transformStamped;
-    transformStamped.header.stamp = ros::Time::now();
+    transformStamped.header.stamp = rclcpp::Clock{RCL_ROS_TIME}.now(); //rclcpp::Time::now();
     transformStamped.header.frame_id = "map";
     transformStamped.child_frame_id = robot_frame_name;
     transformStamped.transform = pose;

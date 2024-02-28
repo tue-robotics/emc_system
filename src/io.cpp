@@ -92,7 +92,7 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
 {
     visualization_msgs::msg::Marker pathMarker;
     pathMarker.header.frame_id = "map";
-    pathMarker.header.stamp = ros::Time();
+    pathMarker.header.stamp = rclcpp::Clock{RCL_ROS_TIME}.now();
     pathMarker.ns = "path";
     pathMarker.id = id;
     pathMarker.type = visualization_msgs::msg::Marker::LINE_STRIP;
