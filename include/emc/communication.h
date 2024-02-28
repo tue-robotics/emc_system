@@ -66,7 +66,7 @@ private:
 
     // pose publishing
     std::string robot_frame_name;
-    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2_; //has to be defined after ros::init(), which is called in the constructor
+    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2_;
 
     // Laser data
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_laser_;
