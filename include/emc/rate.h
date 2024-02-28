@@ -12,14 +12,14 @@ class GenericRate;
 namespace emc
 {
 
-class Rate2
+class Rate
 {
 
 public:
 
-    Rate2(double freq);
+    Rate(double freq);
 
-    ~Rate2();
+    ~Rate();
 
     void sleep();
 

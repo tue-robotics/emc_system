@@ -1,14 +1,14 @@
 #include "emc/rate.h"
 
 
-emc::Rate2::Rate2(double freq)
+emc::Rate::Rate(double freq)
 {
     //rclcpp::Time::init();
     rate_ = new rclcpp::Rate(freq);
     //logger_ = rclcpp::get_logger("ratelogger");
 }
 
-emc::Rate2::~Rate2()
+emc::Rate::~Rate()
 {
     if (rate_)
     {
@@ -16,7 +16,7 @@ emc::Rate2::~Rate2()
     }
 }
 
-void emc::Rate2::sleep()
+void emc::Rate::sleep()
 {
     if (!rate_->sleep())
     {
