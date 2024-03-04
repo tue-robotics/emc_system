@@ -10,8 +10,6 @@
 #include <std_msgs/String.h>
 #include <string>
 
-//#include <emc_system/controlEffort.h
-
 namespace emc
 {
 
@@ -46,19 +44,11 @@ Communication::Communication(std::string /*robot_name*/)
     ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>(odom_param, 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
     sub_odom_ = nh.subscribe(odom_sub_options);
 
-    /*
-    ros::SubscribeOptions ce_sub_options = ros::SubscribeOptions::create<emc_system::controlEffort>("/" + robot_name + "/controlEffort", 1, boost::bind(&Communication::controlEffortCallback, this, _1), ros::VoidPtr(), &ce_cb_queue_);
-    sub_ce_ = nh.subscribe(ce_sub_options);
-    */
-
     ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_f_param, 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
     sub_bumper_f_ = nh.subscribe(bumper_f_sub_options);
 
     ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
     sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
-
-    ros::SubscribeOptions mapdata_sub_options = ros::SubscribeOptions::create<nav_msgs::MapMetaData>("/map_metadata", 1, boost::bind(&Communication::mapCallback, this, _1), ros::VoidPtr(), &mapdata_cb_queue_);
-    sub_mapdata_ = nh.subscribe(mapdata_sub_options);
 
     pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
 
@@ -195,26 +185,6 @@ bool Communication::readBackBumperData(BumperData& bumper)
 }
 
 // ----------------------------------------------------------------------------------------------------
-/*
-bool Communication::readControlEffort(ControlEffort& ce)
-{
-    ce_msg_.reset();
-    ce_cb_queue_.callAvailable();
-
-    if (!ce_msg_)
-        return false;
-
-    ce.x  = ce_msg_->I_x;
-    ce.y  = ce_msg_->I_y;
-    ce.th = ce_msg_->I_th;
-
-    ce.timestamp = ce_msg_->header.stamp.toSec();
-
-    return true;
-}
-*/
-
-// ----------------------------------------------------------------------------------------------------
 
 void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
@@ -268,13 +238,6 @@ void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
     pub_tf2->sendTransform(transformStamped);
 }
 
-bool Communication::getMapConfig(MapConfig& config) {
-    if (!mapconfig.mapInitialised)
-        mapdata_cb_queue_.callAvailable(); //try to initialise the map
-    config = mapconfig;
-    return mapconfig.mapInitialised;
-}
-
 // ----------------------------------------------------------------------------------------------------
 
 void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
@@ -309,36 +272,6 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 {
     bumper_b_msg_ = msg;
 }
-
-void Communication::mapCallback(const nav_msgs::MapMetaData::ConstPtr& msg)
-{
-    tf2::Quaternion q(msg->origin.orientation.x,
-                      msg->origin.orientation.y,
-                      msg->origin.orientation.z,
-                      msg->origin.orientation.w);
-    
-    tf2::Matrix3x3 T(q);
-
-    double roll, pitch, yaw;
-    T.getRPY(roll, pitch, yaw);
-
-    mapconfig.mapOrientation = yaw + M_PI/2;
-
-    mapconfig.mapResolution = msg->resolution;
-
-    mapconfig.mapOffsetX = (msg->width * mapconfig.mapResolution / 2) * cos(yaw)-(msg->height * mapconfig.mapResolution / 2) * sin(yaw) + msg->origin.position.x;
-    mapconfig.mapOffsetY = (msg->width * mapconfig.mapResolution / 2) * sin(yaw)+(msg->height * mapconfig.mapResolution / 2) * cos(yaw) + msg->origin.position.y;
-    mapconfig.mapInitialised = true;
-    ROS_INFO_STREAM("Map data loaded");
-    sub_mapdata_.shutdown();
-}
-// ----------------------------------------------------------------------------------------------------
-/*
-void Communication::controlEffortCallback(const emc_system::controlEffortConstPtr& msg)
-{
-    ce_msg_ = msg;
-}
-*/
 
 } // end namespace emc
 
