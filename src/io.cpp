@@ -36,6 +36,11 @@ bool IO::readLaserData(LaserData& scan)
     return comm_->readLaserData(scan);
 }
 
+bool IO::readPoseData(PoseData& pose)
+{
+    return comm_->readPoseData(pose);
+}
+
 bool IO::readOdometryData(OdometryData& odom)
 {
     return comm_->readOdometryData(odom);
@@ -50,6 +55,13 @@ bool IO::readBackBumperData(BumperData& bumper)
 {
     return comm_->readBackBumperData(bumper);
 }
+
+/*
+bool IO::readControlEffort(ControlEffort& ce)
+{
+    return comm_->readControlEffort(ce);
+}
+*/
 
 void IO::sendBaseReference(double vx, double vy, double va)
 {
@@ -88,6 +100,12 @@ bool IO::ok()
 
 bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
 {
+    MapConfig mapData;
+    if (!comm_->getMapConfig(mapData))
+    {
+        ROS_ERROR_STREAM("No map data supplied");
+        return false;
+    }
     visualization_msgs::Marker pathMarker;
     pathMarker.header.frame_id = "map";
     pathMarker.header.stamp = ros::Time();
@@ -123,6 +141,21 @@ bool IO::sendPath(std::vector<std::vector<double>> path, std::array<double, 3> c
                 ROS_WARN_STREAM("point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
             }
         }
+
+        tf2::Transform tfPoint;
+        tfPoint.setOrigin(tf2::Vector3(point.x, point.y, point.z));
+        tfPoint.setRotation(tf2::Quaternion(0, 0, 0, 1));
+        tf2::Transform mapOffset;
+        mapOffset.setOrigin(tf2::Vector3(mapData.mapOffsetX, mapData.mapOffsetY, 0));
+        tf2::Quaternion q;
+        q.setRPY(0, 0, mapData.mapOrientation);
+        mapOffset.setRotation(q);
+
+        tfPoint = mapOffset * tfPoint;
+        point.x = tfPoint.getOrigin().x();
+        point.y = tfPoint.getOrigin().y();
+        point.z = tfPoint.getOrigin().z();
+        
         pathMarker.points.push_back(point);
     }
     if (pathMarker.points.size() < 2)
