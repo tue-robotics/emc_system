@@ -7,6 +7,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/pose.h"
 #include "emc/bumper.h"
 
 namespace emc
@@ -32,6 +33,15 @@ public:
      * @return false if not
      */
     bool readLaserData(LaserData& scan);
+
+    /**
+     * @brief Receive new pose data if available
+     * 
+     * @param pose reference to a PoseData object to write the new data to
+     * @return true if new pose data was available
+     * @return false if not
+     */
+    bool readPoseData(PoseData& pose);
 
     /**
      * @brief Receive new odometrydata if available
