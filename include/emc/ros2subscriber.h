@@ -15,7 +15,7 @@ class Ros2Subscriber : public rclcpp::Node
 
 public:
 
-    Ros2Subscriber(std::string topic_name) : rclcpp::Node(topic_name)
+    Ros2Subscriber(std::string topic_name, std::string node_name) : rclcpp::Node(node_name)
     {
         sub_ = this->create_subscription<T>(topic_name, 10, std::bind(&Ros2Subscriber::callback, this, std::placeholders::_1));
     };

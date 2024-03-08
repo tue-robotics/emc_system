@@ -10,7 +10,7 @@ int main()
     rclcpp::init(0,nullptr);
 
     // Create subscriber
-    std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>("laser_scan");
+    std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>("laser_scan", "emc_laser");
     rclcpp::executors::SingleThreadedExecutor executor;
 
     executor.add_node(laser_node);

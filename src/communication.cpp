@@ -16,8 +16,8 @@ Communication::Communication(std::string /*robot_name*/)
 
     std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
     // temp hardcode param names
-    laser_param = "laser_scan";
-    odom_param = "odom";
+    laser_param = "scan";
+    odom_param = "odometry/filtered";
     bumper_f_param = "bumper_f";
     bumper_b_param = "bumper_b";
     base_ref_param = "cmd_vel";
@@ -37,11 +37,11 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
 */
 
-    laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param);
+    laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
     laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
     laser_executor_->add_node(laser_node_);
 
-    odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param);
+    odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
     odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
     odom_executor_->add_node(odom_node_);
 
