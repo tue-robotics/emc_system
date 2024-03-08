@@ -153,5 +153,3 @@ private:
 } // end namespace emc
 
 #endif
-
-   
