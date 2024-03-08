@@ -3,11 +3,8 @@
 
 #include <iostream>
 
-#include "rclcpp/rclcpp.hpp"
-
 int main()
 {
-    rclcpp::init(0,nullptr);
     // Create IO object, which will initialize the io layer
     emc::IO io;
 

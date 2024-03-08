@@ -4,6 +4,8 @@
 #include "emc/data.h"
 #include "emc/odom.h"
 #include "emc/bumper.h"
+#include "emc/ros2publisher.h"
+#include "emc/ros2subscriber.h"
 
 #include "rclcpp/rclcpp.hpp"
 //#include <ros/callback_queue.h>
@@ -24,7 +26,7 @@
 namespace emc
 {
 
-class Communication : public rclcpp::Node
+class Communication
 {
 
 public:
@@ -44,7 +46,7 @@ public:
 
     void sendBaseVelocity(double vx, double vy, double va);
 
-    void sendOpendoorRequest();
+    void sendOpenDoorRequest();
 
     void sendMarker(visualization_msgs::msg::Marker marker);
 
@@ -55,45 +57,19 @@ public:
     // Postion data
     void sendPoseEstimate(const geometry_msgs::msg::Transform& pose);
 
+    bool sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
+    {
+        return pub_node_->sendPath(path, color, width, id);
+    }
+
 private:
+    Ros2Publisher* pub_node_;
 
-    // Base velocity reference
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr pub_cmd_vel_;
-    rclcpp::Publisher<std_msgs::msg::Empty>::SharedPtr pub_open_door_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_speak_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_play_;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_marker_;
+    std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node_;
+    rclcpp::executors::SingleThreadedExecutor* laser_executor_;
 
-    // pose publishing
-    std::string robot_frame_name;
-    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2_;
-
-    // Laser data
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr sub_laser_;
-
-    sensor_msgs::msg::LaserScan::SharedPtr laser_msg_;
-
-    void laserCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
-
-
-    // Odometry data
-
-    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr sub_odom_;
-
-    nav_msgs::msg::Odometry::SharedPtr odom_msg_;
-
-    void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
-
-    // Bumper data
-    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_f_;
-    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_b_;
-
-    std_msgs::msg::Bool::SharedPtr bumper_f_msg_;
-    std_msgs::msg::Bool::SharedPtr bumper_b_msg_;
-
-    void bumperfCallback(const std_msgs::msg::Bool::SharedPtr msg);
-    void bumperbCallback(const std_msgs::msg::Bool::SharedPtr msg);
-
+    std::shared_ptr<emc::Ros2Subscriber<nav_msgs::msg::Odometry>> odom_node_;
+    rclcpp::executors::SingleThreadedExecutor* odom_executor_;
 };
 
 } // end namespace emc

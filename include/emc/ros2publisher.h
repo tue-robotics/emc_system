@@ -52,7 +52,7 @@ public:
         pub_cmd_vel_->publish(ref);
     };
 
-    void sendOpendoorRequest()
+    void sendOpenDoorRequest()
     {
         std_msgs::msg::Empty msg;
         pub_open_door_->publish(msg);
@@ -87,6 +87,54 @@ public:
         transformStamped.child_frame_id = robot_frame_name;
         transformStamped.transform = pose;
         pub_tf2_->sendTransform(transformStamped);
+    };
+
+    bool sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
+    {
+        visualization_msgs::msg::Marker pathMarker;
+        pathMarker.header.frame_id = "map";
+        pathMarker.header.stamp = rclcpp::Clock{RCL_ROS_TIME}.now();
+        pathMarker.ns = "path";
+        pathMarker.id = id;
+        pathMarker.type = visualization_msgs::msg::Marker::LINE_STRIP;
+        pathMarker.action = visualization_msgs::msg::Marker::ADD;
+        pathMarker.color.a = 1.0;
+        pathMarker.color.r = color[0];
+        pathMarker.color.g = color[1];
+        pathMarker.color.b = color[2];
+        pathMarker.pose.orientation.w = 1.0;
+        pathMarker.scale.x = width;
+        for (std::vector<std::vector<double>>::iterator it = path.begin(); it != path.end(); ++it)
+        {
+            geometry_msgs::msg::Point point;
+            if ((*it).size() < 2)
+            {
+                RCLCPP_WARN_STREAM(this->get_logger(), "Point at index " << std::distance(path.begin(), it) << " has too few dimensions (expected at least 2, got " << (*it).size() << "), skipping.");
+                continue;
+            }
+            point.x = (*it)[0];
+            point.y = (*it)[1];
+            if ((*it).size() == 2)
+            {
+                point.z = 0;
+            }
+            else
+            {
+                point.z = (*it)[3];
+                if ((*it).size() > 3)
+                {
+                    RCLCPP_WARN_STREAM(this->get_logger(), "point at index " << std::distance(path.begin(), it) << " has unused dimensions (expected 2 or 3, got " << (*it).size() << ").");
+                }
+            }
+            pathMarker.points.push_back(point);
+        }
+        if (pathMarker.points.size() < 2)
+        {
+            RCLCPP_ERROR_STREAM(this->get_logger(), "Not enough valid points (expected at least 2, got " << pathMarker.points.size() << ").");
+            return false;
+        }
+        sendMarker(pathMarker);
+        return true;
     };
 
 
