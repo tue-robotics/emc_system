@@ -37,6 +37,8 @@ add_library(emc_system
     include/emc/io.h
     include/emc/rate.h
     include/emc/bumper.h
+    include/emc/ros2subscriber.h
+    include/emc/ros2publisher.h
 
     #src/engine.cpp
     src/communication.cpp
@@ -70,6 +72,12 @@ target_link_libraries(emc_test_speech emc_system)
 add_executable(emc_example1 examples/example01.cpp)
 target_link_libraries(emc_example1 emc_system)
 
+add_executable(emc_test_subscriber examples/test_subscriber.cpp)
+target_link_libraries(emc_test_subscriber emc_system)
+
+add_executable(emc_test_publisher examples/test_publisher.cpp)
+target_link_libraries(emc_test_publisher emc_system)
+
 #add_executable(emc_example2 examples/example02.cpp)
 #target_link_libraries(emc_example2 emc_system)
 
@@ -87,7 +95,7 @@ target_link_libraries(emc_example1 emc_system)
 #############
 ## Install ##
 #############
-install(TARGETS emc_example1 emc_test_io emc_test_speech
+install(TARGETS emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 
