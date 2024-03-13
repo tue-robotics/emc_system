@@ -82,6 +82,9 @@ target_link_libraries(emc_example1 emc_system)
 add_executable(emc_example2 examples/example02.cpp)
 target_link_libraries(emc_example2 emc_system)
 
+add_executable(emc_example3 examples/example03.cpp)
+target_link_libraries(emc_example3 emc_system)
+
 # ------------------------------------------------------------------------------------------------
 #                                             UNIT TESTS
 # ------------------------------------------------------------------------------------------------

@@ -36,6 +36,11 @@ bool IO::readLaserData(LaserData& scan)
     return comm_->readLaserData(scan);
 }
 
+bool IO::readPoseData(PoseData& pose)
+{
+    return comm_->readPoseData(pose);
+}
+
 bool IO::readOdometryData(OdometryData& odom)
 {
     OdometryData new_odom;
