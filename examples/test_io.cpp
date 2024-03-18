@@ -20,10 +20,14 @@ int main()
         emc::OdometryData odom;
         if (io.readOdometryData(odom))
             std::cout << "Odometry: " << odom.x << ", " << odom.y << ", " << odom.a << std::endl;
+        else
+            std::cout << "No Odom received" << std::endl;
 
         emc::LaserData scan;
         if (io.readLaserData(scan))
             std::cout << "Laser: " << scan.ranges.size() << " beams" << std::endl;
+        else
+            std::cout << "No laser received" << std::endl;
 
         // Sleep remaining time
         r.sleep();
