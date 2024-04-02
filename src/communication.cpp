@@ -1,29 +1,31 @@
 #include "emc/communication.h"
 
-#include <ros/node_handle.h>
-#include <ros/subscribe_options.h>
+#include <functional>
+#include <string>
+
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-
-#include <geometry_msgs/Twist.h>
-#include <std_msgs/Empty.h>
-#include <std_msgs/String.h>
-#include <string>
 
 namespace emc
 {
 
-// ----------------------------------------------------------------------------------------------------
-
 Communication::Communication(std::string /*robot_name*/)
 {
+    std::cout << "constructor of Communication" << std::endl;
+    rclcpp::init(0,nullptr);
 
-    ros::VP_string args;
-    ros::init(args, "emc_system", ros::init_options::AnonymousName);
-    ros::Time::init();
-
-    ros::NodeHandle nh;
     std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
+    // temp hardcode param names
+    laser_param = "scan";
+    odom_param = "odometry/filtered";
+    bumper_f_param = "bumper_f";
+    bumper_b_param = "bumper_b";
+    base_ref_param = "cmd_vel";
+    open_door_param = "open_door";
+    speak_param = "speak";
+    play_param = "play";
+    /*
+    // get robot parameters
     if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
     if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
     if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
@@ -33,197 +35,127 @@ Communication::Communication(std::string /*robot_name*/)
     if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
     if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
     if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
+*/
 
-    ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
-    sub_laser_ = nh.subscribe(laser_sub_options);
+    laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
+    laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+    laser_executor_->add_node(laser_node_);
 
-    ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>(odom_param, 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
-    sub_odom_ = nh.subscribe(odom_sub_options);
+    odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
+    odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+    odom_executor_->add_node(odom_node_);
 
-    ros::SubscribeOptions bumper_f_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_f_param, 1, boost::bind(&Communication::bumperfCallback, this, _1), ros::VoidPtr(), &bumper_f_cb_queue_);
-    sub_bumper_f_ = nh.subscribe(bumper_f_sub_options);
-
-    ros::SubscribeOptions bumper_b_sub_options = ros::SubscribeOptions::create<std_msgs::Bool>(bumper_b_param, 1, boost::bind(&Communication::bumperbCallback, this, _1), ros::VoidPtr(), &bumper_b_cb_queue_);
-    sub_bumper_b_ = nh.subscribe(bumper_b_sub_options);
-
-    pub_base_ref_ = nh.advertise<geometry_msgs::Twist>(base_ref_param, 1);
-
-    pub_open_door_ = nh.advertise<std_msgs::Empty>(open_door_param, 1);
-
-    pub_speak_ = nh.advertise<std_msgs::String>(speak_param, 1);
-    pub_play_ = nh.advertise<std_msgs::String>(play_param, 1);
-
-    pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
-
-    pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
+    pub_node_ = new Ros2Publisher();
 }
-
-// ----------------------------------------------------------------------------------------------------
 
 Communication::~Communication()
 {
     
 }
 
-// ----------------------------------------------------------------------------------------------------
-
 void Communication::init()
 {
 }
 
-// ----------------------------------------------------------------------------------------------------
-
 bool Communication::readLaserData(LaserData& scan)
 {
-    laser_msg_.reset();
-    laser_cb_queue_.callAvailable();
+    laser_executor_->spin_once(std::chrono::nanoseconds(0)); // wait 0 nanoseconds for new messages. just empty the buffer.
 
-    if (!laser_msg_)
+    sensor_msgs::msg::LaserScan msg;
+    if(!laser_node_->readMsg(msg))
         return false;
 
-    scan.range_min = laser_msg_->range_min;
-    scan.range_max = laser_msg_->range_max;
-    scan.ranges = laser_msg_->ranges;
-    scan.angle_min = laser_msg_->angle_min;
-    scan.angle_max = laser_msg_->angle_max;
-    scan.angle_increment = laser_msg_->angle_increment;
-    scan.timestamp = laser_msg_->header.stamp.toSec();
+    scan.range_min = msg.range_min;
+    scan.range_max = msg.range_max;
+    scan.ranges = msg.ranges;
+    scan.angle_min = msg.angle_min;
+    scan.angle_max = msg.angle_max;
+    scan.angle_increment = msg.angle_increment;
+    scan.timestamp = rclcpp::Time(msg.header.stamp).seconds();
 
     return true;
 }
-
-// ----------------------------------------------------------------------------------------------------
 
 bool Communication::readOdometryData(OdometryData& odom)
 {
-    odom_msg_.reset();
-    odom_cb_queue_.callAvailable();
-
-    if (!odom_msg_)
+    odom_executor_->spin_once(std::chrono::nanoseconds(0)); // wait 0 nanoseconds for new messages. just empty the buffer.
+    
+    nav_msgs::msg::Odometry msg;
+    if(!odom_node_->readMsg(msg))
         return false;
-
-    odom.x = odom_msg_->pose.pose.position.x;
-    odom.y = odom_msg_->pose.pose.position.y;
+    
+    odom.x = msg.pose.pose.position.x;
+    odom.y = msg.pose.pose.position.y;
 
     // Calculate yaw rotation from quaternion
-    const geometry_msgs::Quaternion& q = odom_msg_->pose.pose.orientation;
+    const geometry_msgs::msg::Quaternion& q = msg.pose.pose.orientation;
     odom.a = atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
 
-    odom.timestamp = odom_msg_->header.stamp.toSec();
+    odom.timestamp = rclcpp::Time(msg.header.stamp).seconds();
 
     return true;
 }
 
-// ----------------------------------------------------------------------------------------------------
-
-bool Communication::readFrontBumperData(BumperData& bumper)
+bool Communication::readFrontBumperData(BumperData& /*bumper*/)
 {
+    return false;
+    /*
     bumper_f_msg_.reset();
 
-    bumper_f_cb_queue_.callAvailable();
+    //bumper_f_cb_queue_.callAvailable();
 
     if (!bumper_f_msg_)
         return false;
 
     bumper.contact = bumper_f_msg_->data;
     return true;
+    */
 }
 
-// ----------------------------------------------------------------------------------------------------
-
-bool Communication::readBackBumperData(BumperData& bumper)
+bool Communication::readBackBumperData(BumperData& /*bumper*/)
 {
+    return false;
+    /*
     bumper_b_msg_.reset();
 
-    bumper_b_cb_queue_.callAvailable();
+    //bumper_b_cb_queue_.callAvailable();
 
     if (!bumper_b_msg_)
         return false;
 
     bumper.contact = bumper_b_msg_->data;
     return true;
+    */
 }
-
-// ----------------------------------------------------------------------------------------------------
 
 void Communication::sendBaseVelocity(double vx, double vy, double va)
 {
-    geometry_msgs::Twist ref;
-    ref.linear.x = vx;
-    ref.linear.y = vy;
-    ref.angular.z = va;
-
-    pub_base_ref_.publish(ref);
+    pub_node_->sendBaseVelocity(vx,vy, va);
 }
 
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::sendOpendoorRequest()
+void Communication::sendOpenDoorRequest()
 {
-    std_msgs::Empty msg;
-    pub_open_door_.publish(msg);
+    pub_node_->sendOpenDoorRequest();
 }
 
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::sendMarker(visualization_msgs::Marker marker)
+void Communication::sendMarker(visualization_msgs::msg::Marker marker)
 {
-    pub_marker_.publish(marker);
+    pub_node_->sendMarker(marker);
 }
-
-// ----------------------------------------------------------------------------------------------------
 
 void Communication::speak(const std::string& text)
 {
-    std_msgs::String str;
-    str.data = text;
-    pub_speak_.publish(str);
+    pub_node_->speak(text);
 }
 
 void Communication::play(const std::string& file)
 {
-    std_msgs::String str;
-    str.data = file;
-    pub_play_.publish(str);
+    pub_node_->play(file);
 }
 
-void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
+void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
 {
-    // Publish tf transform
-    geometry_msgs::TransformStamped transformStamped;
-    transformStamped.header.stamp = ros::Time::now();
-    transformStamped.header.frame_id = "map";
-    transformStamped.child_frame_id = robot_frame_name;
-    transformStamped.transform = pose;
-    pub_tf2->sendTransform(transformStamped);
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
-{
-    laser_msg_ = msg;
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
-{
-    odom_msg_ = msg;
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
-{
-    bumper_f_msg_ = msg;
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
-{
-    bumper_b_msg_ = msg;
+    pub_node_->sendPoseEstimate(pose);
 }
 
 } // end namespace emc

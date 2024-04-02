@@ -4,18 +4,22 @@
 #include "emc/data.h"
 #include "emc/odom.h"
 #include "emc/bumper.h"
+#include "emc/ros2publisher.h"
+#include "emc/ros2subscriber.h"
 
-#include <ros/publisher.h>
-#include <ros/subscriber.h>
-#include <ros/callback_queue.h>
+#include "rclcpp/rclcpp.hpp"
+//#include <ros/callback_queue.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <sensor_msgs/JointState.h>
-#include <nav_msgs/MapMetaData.h>
+#include "nav_msgs/msg/map_meta_data.hpp"
 
-#include <std_msgs/Bool.h>
-#include <sensor_msgs/LaserScan.h>
-#include <visualization_msgs/Marker.h>
-#include <nav_msgs/Odometry.h>
+#include <std_msgs/msg/bool.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <visualization_msgs/msg/marker.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <std_msgs/msg/empty.hpp>
+#include <std_msgs/msg/string.hpp>
+
 #include <string>
 #include <memory>
 
@@ -42,72 +46,30 @@ public:
 
     void sendBaseVelocity(double vx, double vy, double va);
 
-    void sendOpendoorRequest();
+    void sendOpenDoorRequest();
 
-    void sendMarker(visualization_msgs::Marker marker);
+    void sendMarker(visualization_msgs::msg::Marker marker);
 
     void speak(const std::string& text);
     
     void play(const std::string& file);
 
     // Postion data
-    void sendPoseEstimate(const geometry_msgs::Transform& pose);
+    void sendPoseEstimate(const geometry_msgs::msg::Transform& pose);
+
+    bool sendPath(std::vector<std::vector<double>> path, std::array<double, 3> color, double width, int id)
+    {
+        return pub_node_->sendPath(path, color, width, id);
+    }
 
 private:
+    Ros2Publisher* pub_node_;
 
-    // Base velocity reference
+    std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node_;
+    rclcpp::executors::SingleThreadedExecutor* laser_executor_;
 
-    ros::Publisher pub_base_ref_;
-
-    ros::Publisher pub_open_door_;
-
-    ros::Publisher pub_speak_;
-    
-    ros::Publisher pub_play_;
-
-    ros::Publisher pub_marker_;
-    // Position data
-
-    std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2; //has to be defined after ros::init(), which is called in the constructor
-
-
-    // Laser data
-
-    ros::CallbackQueue laser_cb_queue_;
-
-    ros::Subscriber sub_laser_;
-
-    sensor_msgs::LaserScanConstPtr laser_msg_;
-
-    void laserCallback(const sensor_msgs::LaserScanConstPtr& msg);
-
-
-    // Odometry data
-
-    ros::CallbackQueue odom_cb_queue_;
-
-    ros::Subscriber sub_odom_;
-
-    nav_msgs::OdometryConstPtr odom_msg_;
-
-    void odomCallback(const nav_msgs::OdometryConstPtr& msg);
-
-    // Bumper data
-
-    ros::CallbackQueue bumper_f_cb_queue_;
-    ros::CallbackQueue bumper_b_cb_queue_;
-
-    ros::Subscriber sub_bumper_f_;
-    ros::Subscriber sub_bumper_b_;
-
-    std_msgs::BoolConstPtr bumper_f_msg_;
-    std_msgs::BoolConstPtr bumper_b_msg_;
-
-    void bumperfCallback(const std_msgs::BoolConstPtr& msg);
-    void bumperbCallback(const std_msgs::BoolConstPtr& msg);
-
-    // pose publishing
-    std::string robot_frame_name;
+    std::shared_ptr<emc::Ros2Subscriber<nav_msgs::msg::Odometry>> odom_node_;
+    rclcpp::executors::SingleThreadedExecutor* odom_executor_;
 };
 
 } // end namespace emc

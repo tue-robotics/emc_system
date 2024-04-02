@@ -1,11 +1,14 @@
 #ifndef EMC_SYSTEM_RATE_H_
 #define EMC_SYSTEM_RATE_H_
 
-namespace ros
-{
-class Rate;
-}
+#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/logger.hpp>
 
+/*namespace rclcpp
+{
+class GenericRate;
+}
+*/
 namespace emc
 {
 
@@ -22,8 +25,8 @@ public:
 
 private:
 
-    ros::Rate* rate_;
-
+    rclcpp::GenericRate<std::chrono::system_clock>* rate_;
+    //rclcpp::Logger logger_;
 };
 
 
