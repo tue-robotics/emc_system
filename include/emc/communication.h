@@ -3,6 +3,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/pose.h"
 #include "emc/bumper.h"
 
 #include <ros/publisher.h>
@@ -16,6 +17,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <string>
 #include <memory>
 
@@ -35,10 +37,13 @@ public:
 
     bool readLaserData(LaserData& scan);
 
+    bool readPoseData(PoseData& pose);
+
     bool readOdometryData(OdometryData& odom);
 
     bool readFrontBumperData(BumperData& bumper);
     bool readBackBumperData(BumperData& bumper);
+
 
     void sendBaseVelocity(double vx, double vy, double va);
 
@@ -81,6 +86,15 @@ private:
 
     void laserCallback(const sensor_msgs::LaserScanConstPtr& msg);
 
+    // Pose data
+
+    ros::CallbackQueue pose_cb_queue_;
+
+    ros::Subscriber sub_pose_;
+
+    geometry_msgs::PoseStampedConstPtr pose_msg_;
+
+    void poseCallback(const geometry_msgs::PoseStampedConstPtr& msg);
 
     // Odometry data
 

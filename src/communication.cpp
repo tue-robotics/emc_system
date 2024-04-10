@@ -23,8 +23,9 @@ Communication::Communication(std::string /*robot_name*/)
     ros::Time::init();
 
     ros::NodeHandle nh;
-    std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
+    std::string laser_param, pose_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
     if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
+    if (!nh.getParam("pose_", pose_param)) {ROS_ERROR_STREAM("Parameter " << "pose_" << " not set");};
     if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
     if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
     if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_b_" << " not set");};
@@ -36,6 +37,9 @@ Communication::Communication(std::string /*robot_name*/)
 
     ros::SubscribeOptions laser_sub_options = ros::SubscribeOptions::create<sensor_msgs::LaserScan>(laser_param, 1, boost::bind(&Communication::laserCallback, this, _1), ros::VoidPtr(), &laser_cb_queue_);
     sub_laser_ = nh.subscribe(laser_sub_options);
+
+    ros::SubscribeOptions pose_sub_options = ros::SubscribeOptions::create<geometry_msgs::PoseStamped>(pose_param, 1, boost::bind(&Communication::poseCallback, this, _1), ros::VoidPtr(), &pose_cb_queue_);
+    sub_pose_ = nh.subscribe(pose_sub_options);
 
     ros::SubscribeOptions odom_sub_options = ros::SubscribeOptions::create<nav_msgs::Odometry>(odom_param, 1, boost::bind(&Communication::odomCallback, this, _1), ros::VoidPtr(), &odom_cb_queue_);
     sub_odom_ = nh.subscribe(odom_sub_options);
@@ -88,6 +92,42 @@ bool Communication::readLaserData(LaserData& scan)
     scan.angle_max = laser_msg_->angle_max;
     scan.angle_increment = laser_msg_->angle_increment;
     scan.timestamp = laser_msg_->header.stamp.toSec();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+bool Communication::readPoseData(PoseData& pose)
+{
+    pose_msg_.reset();
+    pose_cb_queue_.callAvailable();
+
+    if (!pose_msg_)
+        return false;
+    
+    // Store position. Optitrack swaps the y and z axis,
+    // but to use the convention of rviz, we swap them back
+    pose.x = pose_msg_->pose.position.x;
+    pose.y = pose_msg_->pose.position.z;
+    pose.z = pose_msg_->pose.position.y;
+
+    // Convert quaternion to roll, pitch, yaw
+    // Again, y and z are swapped to match rviz
+    tf2::Quaternion q(pose_msg_->pose.orientation.x,
+                      pose_msg_->pose.orientation.z,
+                      pose_msg_->pose.orientation.y,
+                      -pose_msg_->pose.orientation.w);
+    
+    tf2::Matrix3x3 T(q);
+
+    double roll, pitch, yaw;
+    T.getRPY(roll, pitch, yaw);
+
+    // Store orientation
+    pose.roll = roll;
+    pose.pitch = pitch;
+    pose.yaw = yaw;
 
     return true;
 }
@@ -207,6 +247,13 @@ void Communication::laserCallback(const sensor_msgs::LaserScanConstPtr& msg)
 
 // ----------------------------------------------------------------------------------------------------
 
+void Communication::poseCallback(const geometry_msgs::PoseStampedConstPtr& msg)
+{
+    pose_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
 void Communication::odomCallback(const nav_msgs::OdometryConstPtr& msg)
 {
     odom_msg_ = msg;
@@ -227,4 +274,5 @@ void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 }
 
 } // end namespace emc
+
 
