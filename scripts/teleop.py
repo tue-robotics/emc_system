@@ -95,7 +95,7 @@ class PublishThread(threading.Thread):
             self.condition.release()
 
             # Publish.
-            self.publisher.publish(twist) #TODO: don't repeat publish when velocity is 0
+            self.publisher.publish(twist)
 
         # Publish stop message when thread exits.
         twist.linear.x = 0
