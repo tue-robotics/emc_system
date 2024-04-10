@@ -46,11 +46,19 @@ public:
     /**
      * @brief Receive new odometrydata if available
      * 
-     * @param odom reference to an OdometryData object to write the new data to
+     * @param[out] odom reference to an OdometryData object to write the new data to. provides displacement since
+     *  last time this function or resetOdometry() was called.
      * @return true if new data was available
      * @return false if not
      */
     bool readOdometryData(OdometryData& odom);
+
+    /**
+     * @brief Set the current position as (0,0,0)
+     * 
+     * @return true if new data was available to reset, false if not
+    */
+    bool resetOdometry();
 
     /**
      * @brief Receive new BumperData from the front bumper
@@ -156,6 +164,10 @@ private:
      * @param ry The yaw component of the rotation.
      */
     bool sendPoseEstimate(double px, double py, double pz, double rr, double rp, double ry); //use roll pitch yaw
+
+    // odometry memory
+    OdometryData prev_odom_;
+    bool odom_set_ = false; // wether odom has been set at least once.
 
     Communication* comm_;
 
