@@ -60,6 +60,12 @@ Communication::Communication(std::string /*robot_name*/)
     pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
 
     pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
+
+
+    // publishers used to visualize information in the localization exercises (particle filter):
+    localization_visualization_pub_laser_msg_ = nh.advertise<sensor_msgs::LaserScan>("/laser_match", 1);
+    localization_visualization_pub_particle_ = nh.advertise<geometry_msgs::PoseArray>("/particles", 1);
+    localization_visualization_pub_pose_ = nh.advertise<geometry_msgs::PoseArray>("/pose_estimate", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -271,6 +277,39 @@ void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
 void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 {
     bumper_b_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// publishing functions used to visualize information in the localization exercises (particle filter):
+
+void Communication::send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
+{
+    sensor_msgs::LaserScan msg{};
+
+    msg.angle_min = angle_min;
+    msg.angle_max = angle_max;
+    msg.angle_increment = angle_inc * subsample;
+
+    msg.range_min = 0.01;
+    msg.range_max = 10;
+
+    msg.header.frame_id = "internal/base_link";
+    msg.header.stamp = this->now();
+
+    msg.ranges = prediction;
+
+    this->pub_laser_msg->publish(msg); //make correct publisher
+    // pub_node_->send_laser_scan(angle_min, angle_max, angle_inc, subsample, prediction);
+}
+
+void Communication::send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
+{
+    // pub_node_->send_particles(N, particle_poses, mapOrientation);
+}
+
+void Communication::send_pose(std::vector<double> pose, double mapOrientation)
+{
+    // pub_node_->send_pose(pose, mapOrientation);
 }
 
 } // end namespace emc
