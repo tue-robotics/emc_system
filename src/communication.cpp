@@ -158,5 +158,22 @@ void Communication::sendPoseEstimate(const geometry_msgs::msg::Transform& pose)
     pub_node_->sendPoseEstimate(pose);
 }
 
+// publishers used to visualize information in the localization exercises (particle filter):
+
+    void Communication::send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
+    {
+        pub_node_->send_laser_scan(angle_min, angle_max, angle_inc, subsample, prediction);
+    }
+
+    void Communication::send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
+    {
+        pub_node_->send_particles(N, particle_poses, mapOrientation);
+    }
+
+    void Communication::send_pose(std::vector<double> pose, double mapOrientation)
+    {
+        pub_node_->send_pose(pose, mapOrientation);
+    }
+
 } // end namespace emc
 
