@@ -29,7 +29,7 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
 )
 
-add_library(emc_system
+add_library(emc_system SHARED
     #include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
@@ -95,7 +95,7 @@ target_link_libraries(emc_test_publisher emc_system)
 #############
 ## Install ##
 #############
-install(TARGETS emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
+install(TARGETS emc_system emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 
