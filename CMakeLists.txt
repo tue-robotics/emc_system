@@ -29,7 +29,7 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
 )
 
-add_library(emc_system SHARED
+add_library(emc-framework SHARED
     #include/emc/engine.h
     include/emc/communication.h
     include/emc/data.h
@@ -46,37 +46,37 @@ add_library(emc_system SHARED
     src/io.cpp
     src/rate.cpp
 )
-ament_target_dependencies(emc_system geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros)
+ament_target_dependencies(emc-framework geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros)
 
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
 # ------------------------------------------------------------------------------------------------
 
 add_executable(emc_viz tools/visualize.cpp)
-target_link_libraries(emc_viz emc_system ${OpenCV_LIBRARIES})
+target_link_libraries(emc_viz emc-framework ${OpenCV_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------
 #                                               IO
 # ------------------------------------------------------------------------------------------------
 
 add_executable(emc_test_io examples/test_io.cpp)
-target_link_libraries(emc_test_io emc_system)
+target_link_libraries(emc_test_io emc-framework)
 
 add_executable(emc_test_speech examples/testspeech.cpp)
-target_link_libraries(emc_test_speech emc_system)
+target_link_libraries(emc_test_speech emc-framework)
 
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
 # ------------------------------------------------------------------------------------------------
 
 add_executable(emc_example1 examples/example01.cpp)
-target_link_libraries(emc_example1 emc_system)
+target_link_libraries(emc_example1 emc-framework)
 
 add_executable(emc_test_subscriber examples/test_subscriber.cpp)
-target_link_libraries(emc_test_subscriber emc_system)
+target_link_libraries(emc_test_subscriber emc-framework)
 
 add_executable(emc_test_publisher examples/test_publisher.cpp)
-target_link_libraries(emc_test_publisher emc_system)
+target_link_libraries(emc_test_publisher emc-framework)
 
 #add_executable(emc_example2 examples/example02.cpp)
 #target_link_libraries(emc_example2 emc_system)
@@ -95,7 +95,7 @@ target_link_libraries(emc_test_publisher emc_system)
 #############
 ## Install ##
 #############
-install(TARGETS emc_system emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
+install(TARGETS emc-framework emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 
