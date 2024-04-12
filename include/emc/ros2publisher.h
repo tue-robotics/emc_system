@@ -147,7 +147,7 @@ namespace emc
 
         // publishers used to visualize information in the localization exercises (particle filter):
 
-        void send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
+        void localization_viz_send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
         {
             sensor_msgs::msg::LaserScan msg{};
 
@@ -166,7 +166,7 @@ namespace emc
             this->pub_laser_msg->publish(msg);
         };
 
-        void send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
+        void localization_viz_send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
         {
             geometry_msgs::msg::PoseArray msg{};
 
@@ -196,7 +196,7 @@ namespace emc
         };
 
 
-        void send_pose(std::vector<double> pose, double mapOrientation)
+        void localization_viz_send_pose(std::vector<double> pose, double mapOrientation)
         {
             geometry_msgs::msg::PoseArray msg;
 
