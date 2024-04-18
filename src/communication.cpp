@@ -90,6 +90,8 @@ bool Communication::readPoseData(PoseData& pose)
     if(!pose_node_->readMsg(msg))
         return false;
 
+    // Apply rotation since the y and z axis are swapped 
+    // in Optitrack with respect to ROS
     pose.x = msg.pose.position.x;
     pose.y = msg.pose.position.z;
     pose.z = msg.pose.position.y;

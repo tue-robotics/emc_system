@@ -45,6 +45,8 @@ private:
     t.header.frame_id = "map";
     t.child_frame_id = robotname_.c_str();
 
+    // Apply rotation since the y and z axis are swapped 
+    // in Optitrack with respect to ROS
     t.transform.translation.x = msg->pose.position.x;
     t.transform.translation.y = msg->pose.position.z;
     t.transform.translation.z = msg->pose.position.y;
