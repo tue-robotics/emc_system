@@ -14,6 +14,7 @@ find_package(nav_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
 # find_package(PCL REQUIRED)
@@ -46,7 +47,7 @@ add_library(emc_system
     src/io.cpp
     src/rate.cpp
 )
-ament_target_dependencies(emc_system geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros)
+ament_target_dependencies(emc_system geometry_msgs tf2_geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros)
 
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
@@ -72,6 +73,9 @@ target_link_libraries(emc_test_speech emc_system)
 add_executable(emc_example1 examples/example01.cpp)
 target_link_libraries(emc_example1 emc_system)
 
+add_executable(emc_example3 examples/example03.cpp)
+target_link_libraries(emc_example3 emc_system)
+
 add_executable(emc_test_subscriber examples/test_subscriber.cpp)
 target_link_libraries(emc_test_subscriber emc_system)
 
@@ -95,8 +99,12 @@ target_link_libraries(emc_test_publisher emc_system)
 #############
 ## Install ##
 #############
-install(TARGETS emc_example1 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
+install(TARGETS emc_example1 emc_example3 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 ament_package()

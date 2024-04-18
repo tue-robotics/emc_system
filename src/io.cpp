@@ -5,7 +5,7 @@
 #include "rclcpp/rclcpp.hpp" // for rclcpp::ok()
 
 #include <tf2/LinearMath/Transform.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 
 #include <string>
@@ -39,6 +39,11 @@ bool IO::readLaserData(LaserData& scan)
     return comm_->readLaserData(scan);
 }
 
+bool IO::readPoseData(PoseData& pose)
+{
+    return comm_->readPoseData(pose);
+}
+
 bool IO::readOdometryData(OdometryData& odom)
 {
     OdometryData new_odom;
@@ -47,7 +52,7 @@ bool IO::readOdometryData(OdometryData& odom)
 
     if (!odom_set_)
     {
-        ROS_WARN("Odom was not yet set. It is set now.");
+        RCLCPP_ERROR(rclcpp::get_logger("emc"), "odom was not yet set. It is set now");
         prev_odom_ = new_odom;
         odom_set_ = true;
         return false;

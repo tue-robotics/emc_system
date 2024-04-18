@@ -3,6 +3,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/pose.h"
 #include "emc/bumper.h"
 #include "emc/ros2publisher.h"
 #include "emc/ros2subscriber.h"
@@ -19,6 +20,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include <string>
 #include <memory>
@@ -38,6 +40,8 @@ public:
     void init();
 
     bool readLaserData(LaserData& scan);
+
+    bool readPoseData(PoseData& pose);
 
     bool readOdometryData(OdometryData& odom);
 
@@ -67,6 +71,9 @@ private:
 
     std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node_;
     rclcpp::executors::SingleThreadedExecutor* laser_executor_;
+
+    std::shared_ptr<emc::Ros2Subscriber<geometry_msgs::msg::PoseStamped>> pose_node_;
+    rclcpp::executors::SingleThreadedExecutor* pose_executor_;
 
     std::shared_ptr<emc::Ros2Subscriber<nav_msgs::msg::Odometry>> odom_node_;
     rclcpp::executors::SingleThreadedExecutor* odom_executor_;

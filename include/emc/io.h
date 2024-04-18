@@ -6,6 +6,7 @@
 #include <string>
 
 #include "emc/data.h"
+#include "emc/pose.h"
 #include "emc/odom.h"
 #include "emc/bumper.h"
 
@@ -41,6 +42,9 @@ public:
      * @return true if new data was available
      * @return false if not
      */
+
+    bool readPoseData(PoseData& pose);
+
     bool readOdometryData(OdometryData& odom);
 
     /**
