@@ -82,6 +82,9 @@ target_link_libraries(emc_test_subscriber emc_system)
 add_executable(emc_test_publisher examples/test_publisher.cpp)
 target_link_libraries(emc_test_publisher emc_system)
 
+add_executable(pose_tf2_broadcaster src/pose_tf2_broadcaster.cpp)
+target_link_libraries(pose_tf2_broadcaster emc_system)
+
 #add_executable(emc_example2 examples/example02.cpp)
 #target_link_libraries(emc_example2 emc_system)
 
@@ -99,7 +102,7 @@ target_link_libraries(emc_test_publisher emc_system)
 #############
 ## Install ##
 #############
-install(TARGETS emc_example1 emc_example3 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher
+install(TARGETS emc_example1 emc_example3 emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher pose_tf2_broadcaster
   DESTINATION lib/${PROJECT_NAME}
 )
 

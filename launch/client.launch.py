@@ -2,7 +2,7 @@
 
 import os
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, GroupAction
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
@@ -10,6 +10,7 @@ from ament_index_python.packages import get_package_share_directory
 # Define the launch description
 def generate_launch_description():
     ld = LaunchDescription()
+    package_name = 'emc_system'
     vrpn_mocap = get_package_share_directory('vrpn_mocap')
     server = LaunchConfiguration('server')
     port = LaunchConfiguration('port')
@@ -25,18 +26,30 @@ def generate_launch_description():
         default_value='3883',
     )
 
-    mocap = Node(
-        package='vrpn_mocap',
-        namespace='vrpn_mocap',
-        executable='client_node',
-        name='vrpn_mocap_client_node',
-        output='screen',
-        parameters=[{
-            'server': server,
-            'port': port, 
-        }, config]
-    )
+    mocap = GroupAction([
+        Node(
+            package='vrpn_mocap',
+            namespace='vrpn_mocap',
+            executable='client_node',
+            name='vrpn_mocap_client_node',
+            output='screen',
+            parameters=[{
+                'server': server,
+                'port': port, 
+            }, config]
+        ),
 
+        Node(
+            package=package_name,
+            executable='pose_tf2_broadcaster',
+            name='pose_tf2_broadcaster_node',
+            output='screen',
+            parameters=[{
+                'robotname' : 'ROSbot_Coco' 
+            }]
+        )
+    ])
+    
     ld.add_action(declare_server)
     ld.add_action(declare_port)
     ld.add_action(mocap)

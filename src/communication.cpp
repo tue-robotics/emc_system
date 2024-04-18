@@ -91,12 +91,12 @@ bool Communication::readPoseData(PoseData& pose)
         return false;
 
     pose.x = msg.pose.position.x;
-    pose.y = msg.pose.position.y;
-    pose.z = msg.pose.position.z;
+    pose.y = msg.pose.position.z;
+    pose.z = msg.pose.position.y;
 
     // Calculate roll, pitch and yaw from quaternion
     const geometry_msgs::msg::Quaternion& q = msg.pose.orientation;
-    tf2::Quaternion tfq(q.x, q.y, q.z, q.w);
+    tf2::Quaternion tfq(q.x, q.z, q.y, -q.w);
     tf2::Matrix3x3 m(tfq);
     m.getRPY(pose.roll, pose.pitch, pose.yaw);
 
