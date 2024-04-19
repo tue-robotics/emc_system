@@ -150,14 +150,8 @@ if __name__ == "__main__":
             key = getKey(key_timeout)
             if key in accelBindings.keys():
                 accel = accelBindings[key]
-                if accel[0]*speed < 0: # check if sign changed
-                    speed = accel[0]
-                else:
-                    speed += accel[0]
-                if accel[1]*turn < 0: # check if sign changed
-                    turn = accel[1]
-                else:
-                    turn += accel[1]
+                speed += accel[0]
+                turn += accel[1]
                 speed = max(min(speed,1),-1)
                 turn = max(min(turn,1),-1)
             elif key =='':
