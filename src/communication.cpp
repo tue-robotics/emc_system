@@ -60,6 +60,12 @@ Communication::Communication(std::string /*robot_name*/)
     pub_marker_ = nh.advertise<visualization_msgs::Marker>("/marker", 1);
 
     pub_tf2 = std::unique_ptr<tf2_ros::TransformBroadcaster>(new tf2_ros::TransformBroadcaster);
+
+
+    // publishers used to visualize information in the localization exercises (particle filter):
+    localization_visualization_pub_laser_msg_ = nh.advertise<sensor_msgs::LaserScan>("/laser_match", 1);
+    localization_visualization_pub_particle_ = nh.advertise<geometry_msgs::PoseArray>("/particles", 1);
+    localization_visualization_pub_pose_ = nh.advertise<geometry_msgs::PoseArray>("/pose_estimate", 1);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -271,6 +277,84 @@ void Communication::bumperfCallback(const std_msgs::BoolConstPtr& msg)
 void Communication::bumperbCallback(const std_msgs::BoolConstPtr& msg)
 {
     bumper_b_msg_ = msg;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// publishing functions used to visualize information in the localization exercises (particle filter):
+
+void Communication::localization_viz_send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
+{
+    sensor_msgs::LaserScan msg{};
+
+    msg.angle_min = angle_min;
+    msg.angle_max = angle_max;
+    msg.angle_increment = angle_inc * subsample;
+
+    msg.range_min = 0.01;
+    msg.range_max = 10;
+
+    msg.header.frame_id = "internal/base_link";
+    msg.header.stamp = ros::Time::now();
+
+    msg.ranges = prediction;
+
+    this->localization_visualization_pub_laser_msg_.publish(msg); //make correct publisher
+    // pub_node_->send_laser_scan(angle_min, angle_max, angle_inc, subsample, prediction);
+}
+
+void Communication::localization_viz_send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
+{
+    geometry_msgs::PoseArray msg{};
+
+    msg.header.frame_id = "map";
+    msg.header.stamp = ros::Time::now();
+    tf2::Quaternion a;
+    msg.poses.reserve(N);
+    for (int i = 0; i < N; i++)
+    {
+        geometry_msgs::Pose posemsg;
+        auto pose_i = particle_poses[i];
+
+        posemsg.position.x = std::cos(mapOrientation) * pose_i[0] - std::sin(mapOrientation) * pose_i[1];
+        posemsg.position.y = std::sin(mapOrientation) * pose_i[0] + std::cos(mapOrientation) * pose_i[1];
+        posemsg.position.z = 0;
+
+        a.setRPY(0, 0, pose_i[2] - mapOrientation);
+        posemsg.orientation.w = a.getW();
+        posemsg.orientation.x = a.getX();
+        posemsg.orientation.y = a.getY();
+        posemsg.orientation.z = a.getZ();
+
+        msg.poses.push_back(posemsg);
+    }
+
+    this->localization_visualization_pub_particle_.publish(msg);
+}
+
+void Communication::localization_viz_send_pose(std::vector<double> pose, double mapOrientation)
+{
+    geometry_msgs::PoseArray msg;
+
+    msg.header.frame_id = "map";
+    msg.header.stamp = ros::Time::now();
+    tf2::Quaternion a;
+
+    msg.poses.reserve(1);
+
+    geometry_msgs::Pose posemsg;
+    posemsg.position.x = std::cos(mapOrientation) * pose[0] - std::sin(mapOrientation) * pose[1];
+    posemsg.position.y = std::sin(mapOrientation) * pose[0] + std::cos(mapOrientation) * pose[1];
+    posemsg.position.z = 0;
+
+    a.setRPY(0, 0, pose[2] - mapOrientation);
+    posemsg.orientation.w = a.getW();
+    posemsg.orientation.x = a.getX();
+    posemsg.orientation.y = a.getY();
+    posemsg.orientation.z = a.getZ();
+
+    msg.poses.push_back(posemsg);
+
+    this->localization_visualization_pub_pose_.publish(msg);
 }
 
 } // end namespace emc

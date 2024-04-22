@@ -193,4 +193,24 @@ bool IO::sendPoseEstimate(double x, double y, double yaw)
     return this->sendPoseEstimate(x, y, 0, 0, 0, yaw);
 }
 
+
+// publishers used to visualize information in the localization exercises (particle filter):
+
+void IO::localization_viz_send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction)
+{
+    comm_->localization_viz_send_laser_scan(angle_min, angle_max, angle_inc, subsample, prediction);
+}
+
+
+void IO::localization_viz_send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation)
+{
+    comm_->localization_viz_send_particles(N, particle_poses, mapOrientation);
+}
+
+
+void IO::localization_viz_send_pose(std::vector<double> pose, double mapOrientation)
+{
+    comm_->localization_viz_send_pose(pose, mapOrientation);
+}
+
 }

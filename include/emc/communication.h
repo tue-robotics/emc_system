@@ -15,6 +15,7 @@
 
 #include <std_msgs/Bool.h>
 #include <sensor_msgs/LaserScan.h>
+#include <geometry_msgs/PoseArray.h>
 #include <visualization_msgs/Marker.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -58,6 +59,11 @@ public:
     // Postion data
     void sendPoseEstimate(const geometry_msgs::Transform& pose);
 
+    // publishing functions used to visualize information in the localization exercises (particle filter):
+    void localization_viz_send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction);
+    void localization_viz_send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation);
+    void localization_viz_send_pose(std::vector<double> pose, double mapOrientation);
+
 private:
 
     // Base velocity reference
@@ -71,6 +77,12 @@ private:
     ros::Publisher pub_play_;
 
     ros::Publisher pub_marker_;
+
+    // publishers used to visualize information in the localization exercises (particle filter):
+    ros::Publisher localization_visualization_pub_laser_msg_;
+    ros::Publisher localization_visualization_pub_particle_;
+    ros::Publisher localization_visualization_pub_pose_;
+
     // Position data
 
     std::unique_ptr<tf2_ros::TransformBroadcaster> pub_tf2; //has to be defined after ros::init(), which is called in the constructor
