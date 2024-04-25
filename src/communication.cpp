@@ -14,9 +14,10 @@ namespace emc
         std::cout << "constructor of Communication" << std::endl;
         rclcpp::init(0, nullptr);
 
-        std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
+        std::string laser_param, pose_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
         // temp hardcode param names
         laser_param = "scan";
+        pose_param = "/vrpn_mocap/ROSbot_Coco/pose";
         odom_param = "odometry/filtered";
         bumper_f_param = "bumper_f";
         bumper_b_param = "bumper_b";
@@ -24,22 +25,27 @@ namespace emc
         open_door_param = "open_door";
         speak_param = "speak";
         play_param = "play";
-        /*
-        // get robot parameters
-        if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
-        if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
-        if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
-        if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_b_" << " not set");};
-        if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter " << "base_ref_" << " not set");};
-        if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter " << "open_door_" << " not set");};
-        if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
-        if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
-        if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
-    */
+    /*
+    // get robot parameters
+    if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
+    if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
+    if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
+    if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_b_" << " not set");};
+    if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter " << "base_ref_" << " not set");};
+    if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter " << "open_door_" << " not set");};
+    if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
+    if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
+    if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
+*/
 
         laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
         laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
         laser_executor_->add_node(laser_node_);
+
+        rclcpp::QoS qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+        pose_node_ = std::make_shared<emc::Ros2Subscriber<geometry_msgs::msg::PoseStamped>>(pose_param, "emc_pose", qos);
+        pose_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+        pose_executor_->add_node(pose_node_);
 
         odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
         odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
@@ -75,9 +81,41 @@ namespace emc
         return true;
     }
 
-    bool Communication::readOdometryData(OdometryData &odom)
+    bool Communication::readPoseData(PoseData& pose)
+    {
+        pose_executor_->spin_once(std::chrono::nanoseconds(0)); // wait 0 nanoseconds for new messages. just empty the buffer.
+
+        geometry_msgs::msg::PoseStamped msg;
+        if(!pose_node_->readMsg(msg))
+            return false;
+
+        // Apply rotation since the y and z axis are swapped 
+        // in Optitrack with respect to ROS
+        pose.x = msg.pose.position.x;
+        pose.y = msg.pose.position.z;
+        pose.z = msg.pose.position.y;
+
+        // Calculate roll, pitch and yaw from quaternion
+        const geometry_msgs::msg::Quaternion& q = msg.pose.orientation;
+        tf2::Quaternion tfq(q.x, q.z, q.y, -q.w);
+        tf2::Matrix3x3 m(tfq);
+        m.getRPY(pose.roll, pose.pitch, pose.yaw);
+
+        pose.timestamp = rclcpp::Time(msg.header.stamp).seconds();
+
+        return true;
+    }
+
+    bool Communication::readOdometryData(OdometryData& odom)
     {
         odom_executor_->spin_once(std::chrono::nanoseconds(0)); // wait 0 nanoseconds for new messages. just empty the buffer.
+    
+        nav_msgs::msg::Odometry msg;
+        if(!odom_node_->readMsg(msg))
+            return false;
+    
+        odom.x = msg.pose.pose.position.x;
+        odom.y = msg.pose.pose.position.y;
 
         nav_msgs::msg::Odometry msg;
         if (!odom_node_->readMsg(msg))

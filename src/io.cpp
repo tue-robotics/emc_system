@@ -5,7 +5,7 @@
 #include "rclcpp/rclcpp.hpp" // for rclcpp::ok()
 
 #include <tf2/LinearMath/Transform.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 #include <string>
 
@@ -38,7 +38,12 @@ namespace emc
         return comm_->readLaserData(scan);
     }
 
-    bool IO::readOdometryData(OdometryData &odom)
+    bool IO::readPoseData(PoseData& pose)
+    {
+        return comm_->readPoseData(pose);
+    }
+
+    bool IO::readOdometryData(OdometryData& odom)
     {
         OdometryData new_odom;
         if (!comm_->readOdometryData(new_odom))

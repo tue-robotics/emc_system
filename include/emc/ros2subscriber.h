@@ -15,9 +15,11 @@ class Ros2Subscriber : public rclcpp::Node
 
 public:
 
-    Ros2Subscriber(std::string topic_name, std::string node_name) : rclcpp::Node(node_name)
+    Ros2Subscriber(std::string topic_name, std::string node_name, 
+                    const rclcpp::QoS& qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable()) 
+        : rclcpp::Node(node_name), qos_(qos)
     {
-        sub_ = this->create_subscription<T>(topic_name, 10, std::bind(&Ros2Subscriber::callback, this, std::placeholders::_1));
+        sub_ = this->create_subscription<T>(topic_name, qos_, std::bind(&Ros2Subscriber::callback, this, std::placeholders::_1));
     };
 
     bool readMsg(T& msg)
@@ -33,6 +35,8 @@ private:
     typename rclcpp::Subscription<T>::SharedPtr sub_;
 
     typename T::SharedPtr msg_;
+
+    rclcpp::QoS qos_;
 
     void callback(const typename T::SharedPtr msg){
         msg_ = msg;
