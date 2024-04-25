@@ -1,14 +1,13 @@
 #ifndef EMC_SYSTEM_RATE_H_
 #define EMC_SYSTEM_RATE_H_
 
-#include "rclcpp/rclcpp.hpp"
-#include <rclcpp/logger.hpp>
+#include <chrono>
 
-/*namespace rclcpp
+namespace rclcpp
 {
-class GenericRate;
+template<typename Type> class GenericRate;
 }
-*/
+
 namespace emc
 {
 

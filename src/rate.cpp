@@ -1,5 +1,7 @@
 #include "emc/rate.h"
 
+#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/logger.hpp>
 
 emc::Rate::Rate(double freq)
 {
