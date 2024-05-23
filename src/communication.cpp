@@ -121,9 +121,9 @@ bool Communication::readPoseData(PoseData& pose)
     // Convert quaternion to roll, pitch, yaw
     // Again, y and z are swapped to match rviz
     tf2::Quaternion q(pose_msg_->pose.orientation.x,
-                      pose_msg_->pose.orientation.z,
                       pose_msg_->pose.orientation.y,
-                      -pose_msg_->pose.orientation.w);
+                      pose_msg_->pose.orientation.z,
+                      pose_msg_->pose.orientation.w);
     
     tf2::Matrix3x3 T(q);
 
