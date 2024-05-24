@@ -75,6 +75,9 @@ target_link_libraries(testspeech emc_system)
 add_executable(test_send_path examples/test_sendpath.cpp)
 target_link_libraries(test_send_path emc_system)
 
+add_executable(test_send_pose examples/test_sendpose.cpp)
+target_link_libraries(test_send_pose emc_system)
+
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
 # ------------------------------------------------------------------------------------------------
