@@ -2,6 +2,8 @@
 
 #include <ros/node_handle.h>
 #include <ros/subscribe_options.h>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 
@@ -235,12 +237,18 @@ void Communication::play(const std::string& file)
 
 void Communication::sendPoseEstimate(const geometry_msgs::Transform& pose)
 {
+    // invert the pose because ros architecture sucks balls
+    tf2::Transform transform;
+    tf2::fromMsg(pose, transform);
+    geometry_msgs::Transform inverted_transform_msg;
+    inverted_transform_msg = tf2::toMsg(transform.inverse());
+
     // Publish tf transform
     geometry_msgs::TransformStamped transformStamped;
     transformStamped.header.stamp = ros::Time::now();
-    transformStamped.header.frame_id = "map";
-    transformStamped.child_frame_id = robot_frame_name;
-    transformStamped.transform = pose;
+    transformStamped.header.frame_id = robot_frame_name;
+    transformStamped.child_frame_id = "map";
+    transformStamped.transform = inverted_transform_msg;
     pub_tf2->sendTransform(transformStamped);
 }
 
