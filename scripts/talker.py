@@ -10,7 +10,7 @@ class MinimalPublisher(Node):
 
     def __init__(self):
         super().__init__('minimal_publisher')
-        self.odom_publisher_ = self.create_publisher(Odometry, 'odom', 10)
+        self.odom_publisher_ = self.create_publisher(Odometry, 'odom/filtered', 10)
         self.laser_publisher_ = self.create_publisher(LaserScan, 'laser_scan', 10)
 
         timer_period = 0.1  # seconds

@@ -71,7 +71,6 @@ namespace emc
         scan.angle_max = msg.angle_max;
         scan.angle_increment = msg.angle_increment;
         scan.timestamp = rclcpp::Time(msg.header.stamp).seconds();
-
         return true;
     }
 

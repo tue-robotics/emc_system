@@ -32,7 +32,6 @@ struct ControlEffort
 
 // ----------------------------------------------------------------------------------------------------
 
-/*
 class FSMInterface
 {
 
@@ -52,7 +51,6 @@ private:
     std::string event_;
 
 };
-*/
 } // end namespace emc
 
 #endif

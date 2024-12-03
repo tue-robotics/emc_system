@@ -1,11 +1,9 @@
 #include "emc/rate.h"
-
 #include "rclcpp/rclcpp.hpp"
 #include <rclcpp/logger.hpp>
 
 emc::Rate::Rate(double freq)
 {
-    //rclcpp::Time::init();
     rate_ = new rclcpp::Rate(freq);
     //logger_ = rclcpp::get_logger("ratelogger");
 }

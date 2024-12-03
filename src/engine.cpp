@@ -1,8 +1,7 @@
 #include "emc/engine.h"
 #include "emc/communication.h"
 
-#include <ros/init.h>
-#include <ros/rate.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace emc
 {
@@ -49,15 +48,17 @@ void Engine::run()
 
     io_ = new IO;
 
-    ros::Rate r(loop_freq_);
-    while(ros::ok())
+    auto node = rclcpp::Node::make_shared("engine_node");
+    rclcpp::Rate rate(loop_freq_);
+
+    while (rclcpp::ok())
     {
         FSMInterface fsm;
 
         StateDetail& s = state_details[state_];
         s.func(fsm, *io_, user_data_);
 
-        if (!ros::ok())
+        if (!rclcpp::ok())
             break;
 
         int event_id = getEvent(fsm.event().c_str());
@@ -79,7 +80,7 @@ void Engine::run()
             state_ = it->second;
         }
 
-        r.sleep();
+        rate.sleep();
     }
 }
 
