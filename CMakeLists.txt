@@ -52,6 +52,9 @@ add_library(emc-framework SHARED
 )
 ament_target_dependencies(emc-framework geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros tf2_geometry_msgs)
 
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
 # ------------------------------------------------------------------------------------------------
