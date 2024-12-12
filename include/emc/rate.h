@@ -1,7 +1,7 @@
 #ifndef EMC_SYSTEM_RATE_H_
 #define EMC_SYSTEM_RATE_H_
 
-#include <rclcpp/rclcpp.hpp>
+#include "rclcpp/rclcpp.hpp"
 
 namespace emc
 {

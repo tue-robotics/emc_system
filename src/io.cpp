@@ -51,12 +51,12 @@ namespace emc
             return false;
         }
 
-        odom.timestamp = new_odom.timestamp; // TODO give dt?
-        double dx = new_odom.x - prev_odom_.x;
-        double dy = new_odom.y - prev_odom_.y;
-        odom.x = cos(prev_odom_.a) * dx + sin(prev_odom_.a) * dy;
-        odom.y = -sin(prev_odom_.a) * dx + cos(prev_odom_.a) * dy;
-        odom.a = fmod(new_odom.a - prev_odom_.a + M_PI, 2 * M_PI) - M_PI;
+    odom.timestamp = new_odom.timestamp; //TODO give dt?
+    double dx = new_odom.x - prev_odom_.x;
+    double dy = new_odom.y - prev_odom_.y;
+    odom.x = cos(prev_odom_.a) * dx + sin(prev_odom_.a) * dy;
+    odom.y = -sin(prev_odom_.a) * dx + cos(prev_odom_.a) * dy;
+    odom.a = fmod(new_odom.a - prev_odom_.a + 3*M_PI, 2*M_PI) - M_PI; // wrap to -pi +pi accounting for worst case values of odom and prev
 
         prev_odom_ = new_odom;
         return true;
@@ -89,10 +89,10 @@ namespace emc
 
     void IO::sendOpendoorRequest()
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-        system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
-#pragma GCC diagnostic pop
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-result"
+                system("aplay --device front:CARD=Device_1,DEV=0 ~/.emc/system/src/emc_system/sounds/doorbell.wav &");
+        #pragma GCC diagnostic pop
 
         comm_->sendOpenDoorRequest();
     }

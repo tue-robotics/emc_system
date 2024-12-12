@@ -3,6 +3,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/pose.h"
 #include "emc/bumper.h"
 #include "emc/ros2publisher.h"
 #include "emc/ros2subscriber.h"
@@ -17,6 +18,8 @@
 #include <visualization_msgs/msg/marker.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_msgs/msg/string.hpp>
 
@@ -43,6 +46,7 @@ public:
 
     bool readFrontBumperData(BumperData& bumper);
     bool readBackBumperData(BumperData& bumper);
+
 
     void sendBaseVelocity(double vx, double vy, double va);
 

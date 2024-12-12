@@ -72,6 +72,12 @@ target_link_libraries(emc_test_io emc-framework)
 add_executable(emc_test_speech examples/testspeech.cpp)
 target_link_libraries(emc_test_speech emc-framework)
 
+add_executable(test_send_path examples/test_sendpath.cpp)
+target_link_libraries(test_send_path emc-framework)
+
+add_executable(test_send_pose examples/test_sendpose.cpp)
+target_link_libraries(test_send_pose emc-framework)
+
 # ------------------------------------------------------------------------------------------------
 #                                             EXAMPLES
 # ------------------------------------------------------------------------------------------------

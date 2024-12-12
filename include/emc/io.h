@@ -7,6 +7,7 @@
 
 #include "emc/data.h"
 #include "emc/odom.h"
+#include "emc/pose.h"
 #include "emc/bumper.h"
 
 namespace emc
