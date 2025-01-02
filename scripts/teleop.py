@@ -4,8 +4,8 @@ from __future__ import print_function
 
 import threading
 
-import rospy
-
+# import rospy
+import rclpy, time
 from geometry_msgs.msg import Twist
 
 import sys, select, termios, tty
@@ -41,10 +41,15 @@ speedBindings={
 class PublishThread(threading.Thread):
     def __init__(self, rate, robot_name):
         super(PublishThread, self).__init__()
-        if not rospy.has_param('base_ref_'):
-            raise Exception("Could not find base_ref_ on parameter server")
-        cmd_vel_topic = rospy.get_param('base_ref_')
-        self.publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=1)
+        # if not rospy.has_param('base_ref_'):
+        #     raise Exception("Could not find base_ref_ on parameter server")
+        # cmd_vel_topic = rospy.get_param('base_ref_')
+        # self.publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=1)
+
+        if not node.has_parameter('base_ref_'):
+            raise Exception("Could not find base_ref_ on parameter server")        
+        cmd_vel_topic = node.declare_parameter('base_ref_').value
+        self.publisher = node.create_publisher(Twist, cmd_vel_topic, 1)
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
@@ -64,13 +69,22 @@ class PublishThread(threading.Thread):
 
     def wait_for_subscribers(self):
         i = 0
-        while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
+        # while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
+        #     if i == 4:
+        #         print("Waiting for subscriber to connect to {}".format(self.publisher.name))
+        #     rospy.sleep(0.5)
+        #     i += 1
+        #     i = i % 5
+        # if rospy.is_shutdown():
+        #     raise Exception("Got shutdown request before subscribers connected")
+
+        while rclpy.ok() and self.publisher.get_num_connections() == 0:
             if i == 4:
                 print("Waiting for subscriber to connect to {}".format(self.publisher.name))
-            rospy.sleep(0.5)
+            time.sleep(0.5)
             i += 1
             i = i % 5
-        if rospy.is_shutdown():
+        if not rclpy.ok():
             raise Exception("Got shutdown request before subscribers connected")
 
     def update(self, x, y, th, speed, turn):
@@ -141,12 +155,21 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         robot_name = sys.argv[1]
 
-    rospy.init_node('teleop_twist_keyboard_'+robot_name)
+    # rospy.init_node('teleop_twist_keyboard_'+robot_name)
 
-    speed = rospy.get_param("~speed", 0.25)
-    turn = rospy.get_param("~turn", 0.5)
-    repeat = rospy.get_param("~repeat_rate", 0.0)
-    key_timeout = rospy.get_param("~key_timeout", 0.0)
+    rclpy.init(args=sys.argv)
+    node = rclpy.create_node('teleop_twist_keyboard_'+robot_name)
+
+    # speed = rospy.get_param("~speed", 0.25)
+    # turn = rospy.get_param("~turn", 0.5)
+    # repeat = rospy.get_param("~repeat_rate", 0.0)
+    # key_timeout = rospy.get_param("~key_timeout", 0.0)
+
+    speed = node.declare_parameter("~speed", 0.25).value
+    turn = node.declare_parameter("~turn", 0.5).value
+    repeat = node.declare_parameter("~repeat_rate", 0.0).value
+    key_timeout = node.declare_parameter("~key_timeout", 0.0).value
+
     if key_timeout == 0.0:
         key_timeout = None
 
