@@ -46,10 +46,7 @@ class PublishThread(threading.Thread):
         # cmd_vel_topic = rospy.get_param('base_ref_')
         # self.publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=1)
 
-        if not node.has_parameter('base_ref_'):
-            raise Exception("Could not find base_ref_ on parameter server")        
-        cmd_vel_topic = node.declare_parameter('base_ref_').value
-        self.publisher = node.create_publisher(Twist, cmd_vel_topic, 1)
+        self.publisher = node.create_publisher(Twist, 'cmd_vel', 1)
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
@@ -69,16 +66,7 @@ class PublishThread(threading.Thread):
 
     def wait_for_subscribers(self):
         i = 0
-        # while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
-        #     if i == 4:
-        #         print("Waiting for subscriber to connect to {}".format(self.publisher.name))
-        #     rospy.sleep(0.5)
-        #     i += 1
-        #     i = i % 5
-        # if rospy.is_shutdown():
-        #     raise Exception("Got shutdown request before subscribers connected")
-
-        while rclpy.ok() and self.publisher.get_num_connections() == 0:
+        while rclpy.ok() and self.publisher.get_subscription_count() == 0:
             if i == 4:
                 print("Waiting for subscriber to connect to {}".format(self.publisher.name))
             time.sleep(0.5)
@@ -89,12 +77,11 @@ class PublishThread(threading.Thread):
 
     def update(self, x, y, th, speed, turn):
         self.condition.acquire()
-        self.x = x
-        self.y = y
-        self.th = th
-        self.speed = speed
-        self.turn = turn
-        # Notify publish thread that we have a new message.
+        self.x = float(x)
+        self.y = float(y)
+        self.th = float(th)
+        self.speed = float(speed)
+        self.turn = float(turn)
         self.condition.notify()
         self.condition.release()
 
@@ -113,9 +100,9 @@ class PublishThread(threading.Thread):
             # Copy state into twist message.
             twist.linear.x = self.x * self.speed
             twist.linear.y = self.y * self.speed
-            twist.linear.z = 0
-            twist.angular.x = 0
-            twist.angular.y = 0
+            twist.linear.z = 0.0
+            twist.angular.x = 0.0
+            twist.angular.y = 0.0
             twist.angular.z = self.th * self.turn
 
             self.condition.release()
@@ -124,12 +111,12 @@ class PublishThread(threading.Thread):
             self.publisher.publish(twist)
 
         # Publish stop message when thread exits.
-        twist.linear.x = 0
-        twist.linear.y = 0
-        twist.linear.z = 0
-        twist.angular.x = 0
-        twist.angular.y = 0
-        twist.angular.z = 0
+        twist.linear.x = 0.0
+        twist.linear.y = 0.0
+        twist.linear.z = 0.0
+        twist.angular.x = 0.0
+        twist.angular.y = 0.0
+        twist.angular.z = 0.0
         self.publisher.publish(twist)
 
 
@@ -160,11 +147,6 @@ if __name__ == "__main__":
     rclpy.init(args=sys.argv)
     node = rclpy.create_node('teleop_twist_keyboard_'+robot_name)
 
-    # speed = rospy.get_param("~speed", 0.25)
-    # turn = rospy.get_param("~turn", 0.5)
-    # repeat = rospy.get_param("~repeat_rate", 0.0)
-    # key_timeout = rospy.get_param("~key_timeout", 0.0)
-
     speed = node.declare_parameter("~speed", 0.25).value
     turn = node.declare_parameter("~turn", 0.5).value
     repeat = node.declare_parameter("~repeat_rate", 0.0).value
@@ -172,7 +154,6 @@ if __name__ == "__main__":
 
     if key_timeout == 0.0:
         key_timeout = None
-
 
 
     pub_thread = PublishThread(repeat, robot_name)
