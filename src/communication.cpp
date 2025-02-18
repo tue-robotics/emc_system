@@ -301,7 +301,7 @@ void Communication::localization_viz_send_laser_scan(double angle_min, double an
     msg.range_min = 0.01;
     msg.range_max = 10;
 
-    msg.header.frame_id = "internal/base_link";
+    msg.header.frame_id = "robot_pose";
     msg.header.stamp = ros::Time::now();
 
     msg.ranges = prediction;
