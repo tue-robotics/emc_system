@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(emc_system)
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_compile_options(-Wall -Werror=all)
 add_compile_options(-Wextra -Werror=extra)
 
@@ -16,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system program_options)
 # find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
 #                                          CATKIN EXPORT
@@ -36,6 +39,7 @@ include_directories(
     include
     ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIR}
 )
 
 add_library(emc_system
@@ -46,14 +50,16 @@ add_library(emc_system
     include/emc/io.h
     include/emc/rate.h
     include/emc/bumper.h
+    include/emc/maploader.h
 
     src/engine.cpp
     src/communication.cpp
     src/data.cpp
     src/io.cpp
     src/rate.cpp
+    src/maploader.cpp
 )
-target_link_libraries(emc_system ${catkin_LIBRARIES})
+target_link_libraries(emc_system ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
@@ -90,6 +96,9 @@ target_link_libraries(emc_example2 emc_system)
 
 add_executable(emc_example3 examples/example03.cpp)
 target_link_libraries(emc_example3 emc_system)
+
+add_executable(test_maploader examples/test_maploader.cpp)
+target_link_libraries(test_maploader emc_system)
 
 # ------------------------------------------------------------------------------------------------
 #                                             UNIT TESTS
