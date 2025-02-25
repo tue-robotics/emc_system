@@ -15,11 +15,6 @@ find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-
-
-
-# find_package(Boost REQUIRED COMPONENTS system program_options)
-# find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
@@ -28,9 +23,15 @@ find_package(OpenCV REQUIRED)
 
 include_directories(
     include
-    ${catkin_INCLUDE_DIRS}
-    ${OpenCV_INCLUDE_DIRS}
+    ${rclcpp_INCLUDE_DIRS}
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${sensor_msgs_INCLUDE_DIRS}
+    ${visualization_msgs_INCLUDE_DIRS}
+    ${nav_msgs_INCLUDE_DIRS}
+    ${tf2_INCLUDE_DIRS}
+    ${tf2_ros_INCLUDE_DIRS}
     ${tf2_geometry_msgs_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
 )
 
 add_library(emc-framework SHARED
