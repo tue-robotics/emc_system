@@ -56,6 +56,18 @@ ament_target_dependencies(emc-framework geometry_msgs sensor_msgs visualization_
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
+target_link_libraries(emc-framework
+    ${rclcpp_LIBRARIES}
+    ${geometry_msgs_LIBRARIES}
+    ${sensor_msgs_LIBRARIES}
+    ${visualization_msgs_LIBRARIES}
+    ${nav_msgs_LIBRARIES}
+    ${tf2_LIBRARIES}
+    ${tf2_ros_LIBRARIES}
+    ${tf2_geometry_msgs_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+)
+
 # ------------------------------------------------------------------------------------------------
 #                                              TOOLS
 # ------------------------------------------------------------------------------------------------
