@@ -16,8 +16,8 @@ namespace emc
 
         std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
         // temp hardcode param names
-        laser_param = "scan";
-        odom_param = "odometry/filtered";
+        laser_param = "transformed_scan";
+        odom_param = "odom";
         bumper_f_param = "bumper_f";
         bumper_b_param = "bumper_b";
         base_ref_param = "cmd_vel";
