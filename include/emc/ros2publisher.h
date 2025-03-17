@@ -32,9 +32,9 @@ namespace emc
             bumper_f_param = "bumper_f";
             bumper_b_param = "bumper_b";
             base_ref_param = "cmd_vel";
-            open_door_param = "open_door";
-            speak_param = "speak";
-            play_param = "play";
+            open_door_param = "/pyro/open_door";
+            speak_param = "pyro/text_to_speech/input";
+            play_param = "/text_to_speech/file";
 
             pub_cmd_vel_ = this->create_publisher<geometry_msgs::msg::Twist>(base_ref_param, 10);
             pub_open_door_ = this->create_publisher<std_msgs::msg::Empty>(open_door_param, 10);

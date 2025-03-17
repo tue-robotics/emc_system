@@ -21,9 +21,9 @@ namespace emc
         bumper_f_param = "bumper_f";
         bumper_b_param = "bumper_b";
         base_ref_param = "cmd_vel";
-        open_door_param = "open_door";
-        speak_param = "speak";
-        play_param = "play";
+        open_door_param = "/pyro/open_door";
+        speak_param = "pyro/text_to_speech/input";
+        play_param = "/text_to_speech/file";
         /*
         // get robot parameters
         if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
