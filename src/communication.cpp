@@ -1,4 +1,5 @@
 #include "emc/communication.h"
+#include "rclcpp/rclcpp.hpp"
 
 #include <functional>
 #include <string>
@@ -14,40 +15,55 @@ namespace emc
         // std::cout << "constructor of Communication" << std::endl;
         rclcpp::init(0, nullptr);
 
-        std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
-        // temp hardcode param names
-        laser_param = "transformed_scan";
-        odom_param = "odom";
-        bumper_f_param = "bumper_f";
-        bumper_b_param = "bumper_b";
-        base_ref_param = "cmd_vel";
-        open_door_param = "/pyro/open_door";
-        speak_param = "pyro/text_to_speech/input";
-        play_param = "/text_to_speech/file";
-        /*
-        // get robot parameters
-        if (!nh.getParam("laser_", laser_param)) {ROS_ERROR_STREAM("Parameter " << "laser_" << " not set");};
-        if (!nh.getParam("odom_", odom_param)) {ROS_ERROR_STREAM("Parameter " << "odom_" << " not set");};
-        if (!nh.getParam("bumper_f_", bumper_f_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_f_" << " not set");};
-        if (!nh.getParam("bumper_b_", bumper_b_param)) {ROS_ERROR_STREAM("Parameter " << "bumper_b_" << " not set");};
-        if (!nh.getParam("base_ref_", base_ref_param)) {ROS_ERROR_STREAM("Parameter " << "base_ref_" << " not set");};
-        if (!nh.getParam("open_door_", open_door_param)) {ROS_ERROR_STREAM("Parameter " << "open_door_" << " not set");};
-        if (!nh.getParam("speak_", speak_param)) {ROS_ERROR_STREAM("Parameter " << "speak_" << " not set");};
-        if (!nh.getParam("play_", play_param)) {ROS_ERROR_STREAM("Parameter " << "play_" << " not set");};
-        if (!nh.getParam("base_link_", robot_frame_name)) {ROS_ERROR_STREAM("Parameter " << "base_link_" << " not set");};
-    */
+        auto node = std::make_shared<rclcpp::Node>("communication_node");
+        auto parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(node, "/global_parameter_server");
+        
+        // Wait for the parameter server to be available
+        while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
+            if (!rclcpp::ok()) {
+                RCLCPP_ERROR(node->get_logger(), "Interrupted while waiting for the service. Exiting.");
+                return;
+            }
+            RCLCPP_INFO(node->get_logger(), "Waiting for the parameter service to be available...");
+        }
 
-        laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
-        laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
-        laser_executor_->add_node(laser_node_);
+        // Get parameters from the global parameter server
+        auto parameters_future = parameters_client->get_parameters(
+            {"laser_", "odom_", "bumper_f_", "bumper_b_", "base_ref_", "open_door_", "speak_", "play_", "base_link_"},
+            [this, node](std::shared_future<std::vector<rclcpp::Parameter>> future) {
+                auto result = future.get();
+                std::map<std::string, std::string> params;
+                for (const auto &param : result) {
+                    params[param.get_name()] = param.as_string();
+                }
 
-        odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
-        odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
-        odom_executor_->add_node(odom_node_);
+                std::string laser_param = params["laser_"];
+                std::string odom_param = params["odom_"];
+                std::string bumper_f_param = params["bumper_f_"];
+                std::string bumper_b_param = params["bumper_b_"];
+                std::string base_ref_param = params["base_ref_"];
+                std::string open_door_param = params["open_door_"];
+                std::string speak_param = params["speak_"];
+                std::string play_param = params["play_"];
+                std::string base_link_param = params["base_link_"];
 
-        pub_node_ = new Ros2Publisher();
+                RCLCPP_INFO(node->get_logger(), "Got parameters from global parameter server");
+
+                // Initialize nodes with the retrieved parameters
+                laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
+                laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+                laser_executor_->add_node(laser_node_);
+
+                odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
+                odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+                odom_executor_->add_node(odom_node_);
+
+                pub_node_ = new Ros2Publisher();
+            });
+
+        // Spin the node to process the parameter retrieval callback
+        rclcpp::spin_some(node);
     }
-
     Communication::~Communication()
     {
     }
