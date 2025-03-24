@@ -14,10 +14,10 @@ namespace emc
 
     IO::IO(Communication *comm) : comm_(comm)
     {
-        std::cout << "constructor of io" << std::endl;
+        // std::cout << "constructor of io" << std::endl;
         if (!comm_)
         {
-            std::cout << "constructing comm_" << std::endl;
+            // std::cout << "constructing comm_" << std::endl;
             comm_ = new Communication;
         }
     }

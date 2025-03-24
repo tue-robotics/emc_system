@@ -11,7 +11,7 @@ namespace emc
 
     Communication::Communication(std::string /*robot_name*/)
     {
-        std::cout << "constructor of Communication" << std::endl;
+        // std::cout << "constructor of Communication" << std::endl;
         rclcpp::init(0, nullptr);
 
         std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
