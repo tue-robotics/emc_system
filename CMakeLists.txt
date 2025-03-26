@@ -98,11 +98,11 @@ target_link_libraries(test_send_pose emc-framework)
 add_executable(emc_example1 examples/example01.cpp)
 target_link_libraries(emc_example1 emc-framework)
 
-add_executable(emc_test_subscriber examples/test_subscriber.cpp)
-target_link_libraries(emc_test_subscriber emc-framework)
+# add_executable(emc_test_subscriber examples/test_subscriber.cpp)
+# target_link_libraries(emc_test_subscriber emc-framework)
 
-add_executable(emc_test_publisher examples/test_publisher.cpp)
-target_link_libraries(emc_test_publisher emc-framework)
+# add_executable(emc_test_publisher examples/test_publisher.cpp)
+# target_link_libraries(emc_test_publisher emc-framework)
 
 add_executable(emc_example2 examples/example02.cpp)
 target_link_libraries(emc_example2 emc-framework)
@@ -121,7 +121,7 @@ endif()
 #############
 ## Install ##
 #############
-install(TARGETS emc-framework emc_example1 emc_example2  emc_test_io emc_test_speech emc_test_subscriber emc_test_publisher 
+install(TARGETS emc-framework emc_example1 emc_example2  emc_test_io emc_test_speech  
   DESTINATION lib/${PROJECT_NAME}
 )
 

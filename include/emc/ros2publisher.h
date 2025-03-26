@@ -24,31 +24,22 @@ namespace emc
     {
 
     public:
-        Ros2Publisher() : rclcpp::Node("emc_publishers")
+        Ros2Publisher(const std::string& base_ref_param,
+                    const std::string& open_door_param,
+                    const std::string& speak_param,
+                    const std::string& play_param,
+                    const std::string& marker_param = "/marker")
+            : rclcpp::Node("emc_publishers")
         {
-            std::string laser_param, odom_param, bumper_f_param, bumper_b_param, base_ref_param, open_door_param, speak_param, play_param;
-            laser_param = "laser_scan";
-            odom_param = "odom";
-            bumper_f_param = "bumper_f";
-            bumper_b_param = "bumper_b";
-            base_ref_param = "cmd_vel";
-            open_door_param = "/pyro/open_door";
-            speak_param = "pyro/text_to_speech/input";
-            play_param = "/text_to_speech/file";
-
             pub_cmd_vel_ = this->create_publisher<geometry_msgs::msg::Twist>(base_ref_param, 10);
             pub_open_door_ = this->create_publisher<std_msgs::msg::Empty>(open_door_param, 10);
             pub_speak_ = this->create_publisher<std_msgs::msg::String>(speak_param, 10);
             pub_play_ = this->create_publisher<std_msgs::msg::String>(play_param, 10);
-            pub_marker_ = this->create_publisher<visualization_msgs::msg::Marker>("/marker", 10);
-
-            // publishers used to visualize information in the localization exercises (particle filter):
-            this->pub_laser_msg = this->create_publisher<sensor_msgs::msg::LaserScan>("/laser_match", 1);
-            this->pub_particle = this->create_publisher<geometry_msgs::msg::PoseArray>("/particles", 1);
-            this->pub_pose = this->create_publisher<geometry_msgs::msg::PoseArray>("/pose_estimate", 1);
+            pub_marker_ = this->create_publisher<visualization_msgs::msg::Marker>(marker_param, 10);
 
             pub_tf2_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-        };
+        }
+
 
         void sendBaseVelocity(double vx, double vy, double va)
         {
