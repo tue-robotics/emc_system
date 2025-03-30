@@ -75,6 +75,7 @@ private:
     std::string laser_param_;
     std::string odom_param_;
     std::string bumper_f_param_;
+    std::string pose_param_;    
     std::string bumper_b_param_;
     std::string base_ref_param_;
     std::string open_door_param_;
