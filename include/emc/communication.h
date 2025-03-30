@@ -72,6 +72,16 @@ public:
     void localization_viz_send_pose(std::vector<double> pose, double mapOrientation);
 
 private:
+    std::string laser_param_;
+    std::string odom_param_;
+    std::string bumper_f_param_;
+    std::string bumper_b_param_;
+    std::string base_ref_param_;
+    std::string open_door_param_;
+    std::string speak_param_;
+    std::string play_param_;
+    std::string base_link_param_;
+
     Ros2Publisher* pub_node_;
 
     std::shared_ptr<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>> laser_node_;

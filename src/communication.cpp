@@ -1,5 +1,5 @@
 #include "emc/communication.h"
-
+#include <future> 
 #include <functional>
 #include <string>
 
@@ -8,32 +8,144 @@
 
 namespace emc
 {
+    // Member variable declarations
+    std::string laser_param_;
+    std::string odom_param_;
+    std::string pose_param_;        // Added missing variable
+    std::string bumper_f_param_;
+    std::string bumper_b_param_;
+    std::string base_ref_param_;
+    std::string open_door_param_;
+    std::string speak_param_;
+    std::string play_param_;
+    std::string base_link_param_;   // Added missing variable
+
+    class GetGlobalParam : public rclcpp::Node
+    {
+    public:
+        GetGlobalParam() : Node("get_global_param")
+        {
+            parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(this, "/global_parameter_server");
+            parameters_client_->wait_for_service();
+
+            // Fetch all required parameters
+            auto parameters_future = parameters_client_->get_parameters(
+                {"laser_", "odom_", "pose_", "bumper_f_", "bumper_b_", "base_ref_", "open_door_", "speak_", "play_", "base_link_"},
+                std::bind(&GetGlobalParam::callbackGlobalParam, this, std::placeholders::_1));
+        }
+
+        void callbackGlobalParam(std::shared_future<std::vector<rclcpp::Parameter>> future)
+        {
+            auto result = future.get();
+            for (const auto &param : result)
+            {
+                const std::string &param_name = param.get_name();
+                const std::string &param_value = param.as_string();
+
+                if (param_name == "laser_")
+                    laser_param_ = param_value;
+                else if (param_name == "odom_")
+                    odom_param_ = param_value;
+                else if (param_name == "pose_")
+                    pose_param_ = param_value;
+                else if (param_name == "bumper_f_")
+                    bumper_f_param_ = param_value;
+                else if (param_name == "bumper_b_")
+                    bumper_b_param_ = param_value;
+                else if (param_name == "base_ref_")
+                    base_ref_param_ = param_value;
+                else if (param_name == "open_door_")
+                    open_door_param_ = param_value;
+                else if (param_name == "speak_")
+                    speak_param_ = param_value;
+                else if (param_name == "play_")
+                    play_param_ = param_value;
+                else if (param_name == "base_link_")
+                    base_link_param_ = param_value;
+
+                // Log the retrieved parameter
+                std::cout << "Retrieved parameter: " << param_name << " = " << param_value << std::endl;
+            }
+
+            std::cout << "All parameters retrieved successfully." << std::endl;
+        }
+
+    private:
+        std::shared_ptr<rclcpp::AsyncParametersClient> parameters_client_;
+    };
+
 
     Communication::Communication(std::string /*robot_name*/)
     {
         rclcpp::init(0, nullptr);
 
-        // Define topic names here
-        std::string laser_param = "transformed_scan";
-        std::string odom_param = "odom";
-        std::string bumper_f_param = "bumper_f";
-        std::string bumper_b_param = "bumper_b";
-        std::string base_ref_param = "cmd_vel";
-        std::string open_door_param = "/pyro/open_door";
-        std::string speak_param = "pyro/text_to_speech/input";
-        std::string play_param = "/text_to_speech/file";
+        std::cout << "Creating node for parameter retrieval..." << std::endl;
+        auto node = std::make_shared<rclcpp::Node>("get_global_param");
+        auto parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(node, "/global_parameter_server");
 
-        // Initialize subscribers
-        laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param, "emc_laser");
-        laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
-        laser_executor_->add_node(laser_node_);
+        std::cout << "Waiting for parameter server to be available..." << std::endl;
+        if (!parameters_client->wait_for_service(std::chrono::seconds(5)))
+        {
+            throw std::runtime_error("Parameter server not available.");
+        }
+        std::cout << "Parameter server is available." << std::endl;
 
-        odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param, "emc_odom");
-        odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
-        odom_executor_->add_node(odom_node_);
+        std::cout << "Fetching parameters asynchronously..." << std::endl;
+        parameters_client->get_parameters(
+            {"laser_", "odom_", "pose_", "bumper_f_", "bumper_b_", "base_ref_", "open_door_", "speak_", "play_", "base_link_"},
+            [this](std::shared_future<std::vector<rclcpp::Parameter>> future) {
+                auto result = future.get();
+                for (const auto &param : result)
+                {
+                    const std::string &param_name = param.get_name();
+                    const std::string &param_value = param.as_string();
 
-        // Initialize publisher
-        pub_node_ = new Ros2Publisher(base_ref_param, open_door_param, speak_param, play_param);
+                    if (param_name == "laser_")
+                        laser_param_ = param_value;
+                    else if (param_name == "odom_")
+                        odom_param_ = param_value;
+                    else if (param_name == "pose_")
+                        pose_param_ = param_value;
+                    else if (param_name == "bumper_f_")
+                        bumper_f_param_ = param_value;
+                    else if (param_name == "bumper_b_")
+                        bumper_b_param_ = param_value;
+                    else if (param_name == "base_ref_")
+                        base_ref_param_ = param_value;
+                    else if (param_name == "open_door_")
+                        open_door_param_ = param_value;
+                    else if (param_name == "speak_")
+                        speak_param_ = param_value;
+                    else if (param_name == "play_")
+                        play_param_ = param_value;
+                    else if (param_name == "base_link_")
+                        base_link_param_ = param_value;
+
+                    // Log the retrieved parameter
+                    std::cout << "Retrieved parameter: " << param_name << " = " << param_value << std::endl;
+                }
+
+                std::cout << "All parameters retrieved successfully." << std::endl;
+
+                // Initialize subscribers and publishers after parameters are retrieved
+                laser_node_ = std::make_shared<emc::Ros2Subscriber<sensor_msgs::msg::LaserScan>>(laser_param_, "emc_laser");
+                laser_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+                laser_executor_->add_node(laser_node_);
+                std::cout << "Laser subscriber created." << std::endl;
+
+                odom_node_ = std::make_shared<emc::Ros2Subscriber<nav_msgs::msg::Odometry>>(odom_param_, "emc_odom");
+                odom_executor_ = new rclcpp::executors::SingleThreadedExecutor;
+                odom_executor_->add_node(odom_node_);
+                std::cout << "Odom subscriber created." << std::endl;
+
+                pub_node_ = new Ros2Publisher(base_ref_param_, open_door_param_, speak_param_, play_param_);
+                std::cout << "Publishers created." << std::endl;
+            });
+
+        // Spin the node to process the callback
+        rclcpp::executors::SingleThreadedExecutor executor;
+        executor.add_node(node);
+        executor.spin_some(); // Process callbacks once
     }
 
     Communication::~Communication()
