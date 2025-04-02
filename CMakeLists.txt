@@ -16,6 +16,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # ------------------------------------------------------------------------------------------------
 #                                              BUILD
@@ -32,6 +33,7 @@ include_directories(
     ${tf2_ros_INCLUDE_DIRS}
     ${tf2_geometry_msgs_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIR}
 )
 
 add_library(emc-framework SHARED
@@ -44,13 +46,16 @@ add_library(emc-framework SHARED
     include/emc/bumper.h
     include/emc/ros2subscriber.h
     include/emc/ros2publisher.h
+    include/emc/maploader.h
 
     src/engine.cpp
     src/communication.cpp
     #src/data.cpp
     src/io.cpp
     src/rate.cpp
+    src/maploader.cpp
 )
+
 ament_target_dependencies(emc-framework geometry_msgs sensor_msgs visualization_msgs nav_msgs rclcpp tf2 tf2_ros tf2_geometry_msgs)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}")
@@ -66,6 +71,7 @@ target_link_libraries(emc-framework
     ${tf2_ros_LIBRARIES}
     ${tf2_geometry_msgs_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${YAML_CPP_LIBRARIES}
 )
 
 # ------------------------------------------------------------------------------------------------
@@ -106,6 +112,9 @@ target_link_libraries(emc_example1 emc-framework)
 
 add_executable(emc_example2 examples/example02.cpp)
 target_link_libraries(emc_example2 emc-framework)
+
+add_executable(test_maploader examples/test_maploader.cpp)
+target_link_libraries(test_maploader emc-framework)
 
 # ------------------------------------------------------------------------------------------------
 #                                             UNIT TESTS
