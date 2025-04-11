@@ -2,9 +2,22 @@
 #include "rclcpp/rclcpp.hpp"
 #include <rclcpp/logger.hpp>
 
+class RateImpl {
+    public:
+        explicit RateImpl(double freq)
+            : rate(freq) {}
+    
+        bool sleep() {
+            return rate.sleep();
+        }
+    
+    private:
+        rclcpp::Rate rate;
+    };
+
 emc::Rate::Rate(double freq)
 {
-    rate_ = new rclcpp::Rate(freq);
+    rate_ = new RateImpl(freq);
     //logger_ = rclcpp::get_logger("ratelogger");
 }
 

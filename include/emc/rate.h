@@ -1,9 +1,8 @@
 #ifndef EMC_SYSTEM_RATE_H_
 #define EMC_SYSTEM_RATE_H_
 
-namespace rclcpp{
-    class Rate;
-}
+class RateImpl;
+
 
 namespace emc
 {
@@ -16,8 +15,7 @@ public:
     void sleep();
 
 private:
-    rclcpp::Rate* rate_;
-    //rclcpp::Logger logger_;
+    RateImpl* rate_;
 };
 
 } // end namespace emc
