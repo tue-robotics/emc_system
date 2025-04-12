@@ -51,7 +51,6 @@ private:
     std::string event_;
 
 };
-
 } // end namespace emc
 
 #endif

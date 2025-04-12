@@ -2,7 +2,8 @@
 
 #include "opencv2/imgproc.hpp"
 #include <opencv2/highgui.hpp>
-#include <ros/rate.h>
+
+#include "rclcpp/rclcpp.hpp"
 
 #include <string>
 
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 
     emc::IO io(robot_name);
 
-    ros::Rate r(30);
+    rclcpp::Rate r(30);
     while(io.ok())
     {
         cv::Mat canvas(500, 500, CV_8UC3, cv::Scalar(50, 50, 50));

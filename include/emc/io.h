@@ -35,15 +35,6 @@ public:
     bool readLaserData(LaserData& scan);
 
     /**
-     * @brief Receive new pose data if available
-     * 
-     * @param pose reference to a PoseData object to write the new data to
-     * @return true if new pose data was available
-     * @return false if not
-     */
-    bool readPoseData(PoseData& pose);
-
-    /**
      * @brief Receive new odometrydata if available
      * 
      * @param[out] odom reference to an OdometryData object to write the new data to. provides displacement since
@@ -142,6 +133,7 @@ public:
     void localization_viz_send_laser_scan(double angle_min, double angle_max, double angle_inc, int subsample, std::vector<float> prediction);
     void localization_viz_send_particles(int N, std::vector<std::vector<double>> particle_poses, double mapOrientation);
     void localization_viz_send_pose(std::vector<double> pose, double mapOrientation);
+
 
 private:
 
