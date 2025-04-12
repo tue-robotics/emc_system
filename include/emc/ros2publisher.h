@@ -38,6 +38,9 @@ namespace emc
             pub_marker_ = this->create_publisher<visualization_msgs::msg::Marker>(marker_param, 10);
 
             pub_tf2_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+            pub_laser_msg = this->create_publisher<sensor_msgs::msg::LaserScan>("visualization/laser_scan", 10);
+            pub_particle = this->create_publisher<geometry_msgs::msg::PoseArray>("visualization/particles", 10);
+            pub_pose = this->create_publisher<geometry_msgs::msg::PoseArray>("visualization/pose", 10);
         }
 
 
