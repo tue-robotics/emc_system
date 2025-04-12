@@ -38,9 +38,9 @@ namespace emc
             pub_marker_ = this->create_publisher<visualization_msgs::msg::Marker>(marker_param, 10);
 
             pub_tf2_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
-            pub_laser_msg = this->create_publisher<sensor_msgs::msg::LaserScan>("visualization/laser_scan", 10);
-            pub_particle = this->create_publisher<geometry_msgs::msg::PoseArray>("visualization/particles", 10);
-            pub_pose = this->create_publisher<geometry_msgs::msg::PoseArray>("visualization/pose", 10);
+            pub_laser_msg = this->create_publisher<sensor_msgs::msg::LaserScan>("/laser_match", 10);
+            pub_particle = this->create_publisher<geometry_msgs::msg::PoseArray>("/particles", 10);
+            pub_pose = this->create_publisher<geometry_msgs::msg::PoseArray>("/pose_estimate", 10);
         }
 
 
@@ -152,7 +152,7 @@ namespace emc
             msg.range_min = 0.01;
             msg.range_max = 10;
 
-            msg.header.frame_id = "internal/base_link";
+            msg.header.frame_id = "base_link";
             msg.header.stamp = this->now();
 
             msg.ranges = prediction;
